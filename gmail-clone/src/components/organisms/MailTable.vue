@@ -1,5 +1,6 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
+import { Email } from '../../types/email';
 import Button from "../atoms/Button.vue";
 export default defineComponent({
   components: {
@@ -24,6 +25,7 @@ export default defineComponent({
   <table class="mail-table">
     <tbody>
       <tr v-for="email in emails" :key="email.id">
+        
         <td>
           <input type="checkbox" />
         </td>
