@@ -3,7 +3,7 @@ import { defineComponent, ref, computed } from 'vue'
 import Button from "../components/atoms/Button.vue";
 import MailTable from "../components/organisms/MailTable.vue";
 import BulkActionBar from "../components/organisms/BulkActionBar.vue";
-
+import { useEmailSelection } from '../composables/useEmailFiltering';
 export default defineComponent({
   components: {
     BulkActionBar, Button, MailTable
@@ -49,37 +49,23 @@ export default defineComponent({
         "read": true
       }
     ]);
-
     const selectedScreen = ref("inbox");
 
-    const sortedEmails = computed(() => {
-      return emails.value.sort((email1, email2) => {
-        return email1.sentAt < email2.sentAt ? 1 : -1
-      })
-    });
+    const {filteredEmails} = useEmailSelection(emails, selectedScreen);
+ 
 
-    const unarchivedEmails = computed(() => {
-      return sortedEmails.value.filter(e => !e.archived);
-    })
+    const selectScreen = (newScreen) => {
+        selectedScreen.value = newScreen;
+    }
 
-    const archivedEmails = computed(() => {
-      return sortedEmails.value.filter(e => e.archived);
-    })
 
-    const filteredEmails = computed(() => {
 
-      const filters = ref({
-        inbox: unarchivedEmails,
-        archive: archivedEmails
-      })
-      return filters.value[selectedScreen.value]
-    })
 
     const handleCreate = () => {
       console.log('Child has been created.............');
     }
     const partialSelection = ref("partial-check");
-    return { handleCreate, selectedScreen, emails, partialSelection, filteredEmails }
+    return { handleCreate, selectedScreen, selectScreen, partialSelection, filteredEmails }
   },
 
 })
@@ -89,12 +75,12 @@ export default defineComponent({
 <template>
   <main>
     <Button
-      @click="handleCreate"
+      @click="selectScreen('inbox');"
       content="Inbox View"
       :class="[selectedScreen == 'inbox' ? 'selected' : '']"
     ></Button>
     <Button
-      @click="handleCreate"
+      @click="selectScreen('archive');"
       content="Archived View"
       :class="[selectedScreen == 'archive' ? 'selected' : '']"
       classes="bg-blue-500"
