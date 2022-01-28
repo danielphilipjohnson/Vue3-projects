@@ -50,26 +50,41 @@ export default defineComponent({
       }
     ]);
 
-    const handleCreate = () => {
-      console.log('Child has been created.............');
-    }
+    const selectedScreen = ref("inbox");
 
-    const sortedEmails = computed(() => { 
+    const sortedEmails = computed(() => {
       return emails.value.sort((email1, email2) => {
         return email1.sentAt < email2.sentAt ? 1 : -1
       })
     });
 
+    const unarchivedEmails = computed(() => {
+      return sortedEmails.value.filter(e => !e.archived);
+    })
 
-    const selectedScreen = ref("inbox");
+    const archivedEmails = computed(() => {
+      return sortedEmails.value.filter(e => e.archived);
+    })
+
+    const filteredEmails = computed(() => {
+
+      const filters = ref({
+        inbox: unarchivedEmails,
+        archive: archivedEmails
+      })
+      return filters.value[selectedScreen.value]
+    })
+
+    const handleCreate = () => {
+      console.log('Child has been created.............');
+    }
     const partialSelection = ref("partial-check");
-    return { handleCreate, selectedScreen, emails, partialSelection, sortedEmails }
+    return { handleCreate, selectedScreen, emails, partialSelection, filteredEmails }
   },
 
 })
 
 </script>
-
 
 <template>
   <main>
@@ -87,9 +102,7 @@ export default defineComponent({
     <h1>GMail clone</h1>
 
     <BulkActionBar />
-
-    <MailTable :emails="sortedEmails" />
-
+    <MailTable :emails="filteredEmails" />
   </main>
 </template>
 
