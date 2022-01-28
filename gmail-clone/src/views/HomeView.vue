@@ -1,16 +1,15 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
 import Button from "../components/atoms/Button.vue";
-
+import MailTable from "../components/organisms/MailTable.vue";
 export default defineComponent({
   components: {
-    Button
+    Button, MailTable
   },
 
   setup() {
 
-
-    const email = ref([
+    const emails = ref([
       {
         "id": 1,
         "from": "team@vuemastery.com",
@@ -54,7 +53,7 @@ export default defineComponent({
     }
 
     const selectedScreen = ref("inbox");
-    return { handleCreate, selectedScreen, email }
+    return { handleCreate, selectedScreen, emails }
   },
 
 })
@@ -73,9 +72,11 @@ export default defineComponent({
       @click="handleCreate"
       content="Archived View"
       :class="[selectedScreen == 'archive' ? 'selected' : '']"
+      classes="bg-blue-500"
     ></Button>
     <h1>GMail clone</h1>
-    {{email}}
+
+    <MailTable :emails="emails" />
   </main>
 </template>
 
