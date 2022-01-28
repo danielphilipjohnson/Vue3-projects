@@ -1,10 +1,12 @@
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import { defineComponent, ref, computed } from 'vue'
 import Button from "../components/atoms/Button.vue";
 import MailTable from "../components/organisms/MailTable.vue";
+import BulkActionBar from "../components/organisms/BulkActionBar.vue";
+
 export default defineComponent({
   components: {
-    Button, MailTable
+    BulkActionBar, Button, MailTable
   },
 
   setup() {
@@ -52,8 +54,16 @@ export default defineComponent({
       console.log('Child has been created.............');
     }
 
+    const sortedEmails = computed(() => { 
+      return emails.value.sort((email1, email2) => {
+        return email1.sentAt < email2.sentAt ? 1 : -1
+      })
+    });
+
+
     const selectedScreen = ref("inbox");
-    return { handleCreate, selectedScreen, emails }
+    const partialSelection = ref("partial-check");
+    return { handleCreate, selectedScreen, emails, partialSelection, sortedEmails }
   },
 
 })
@@ -76,7 +86,10 @@ export default defineComponent({
     ></Button>
     <h1>GMail clone</h1>
 
-    <MailTable :emails="emails" />
+    <BulkActionBar />
+
+    <MailTable :emails="sortedEmails" />
+
   </main>
 </template>
 
