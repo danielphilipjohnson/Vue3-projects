@@ -18,7 +18,7 @@ export const useEmailSelection = () => {
     emails.clear();
   };
 
-  const toggle = (id: number) => {
+  const toggle = (id: Email) => {
     if (emails.has(id)) {
       emails.delete(id);
     } else {
