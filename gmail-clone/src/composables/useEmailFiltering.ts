@@ -1,7 +1,7 @@
 import { ref, Ref, computed } from "vue";
 import { Email } from "../types/email";
 
-export const useEmailSelection = (
+export const useEmailFiltering = (
   emails: Ref<Array<Email>>,
   screenMode: Ref<string>
 ) => {
