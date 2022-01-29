@@ -1,33 +1,49 @@
 <script lang="ts">
-import { defineComponent, PropType } from 'vue'
-import { Email } from '../../types/email';
+import { defineComponent, ref, computed, PropType } from "vue";
+import { useEmailSelection } from "../../composables/useEmailSelection";
+import Modal from "./Modal.vue";;
+
+import { Email } from "../../types/email";
 import Button from "../atoms/Button.vue";
 export default defineComponent({
   components: {
-    Button
+    Button,
+    Modal
   },
   props: {
     emails: { type: Array as PropType<Array<Email>> },
   },
-    setup() {
+  setup() {
 
-    const handleCreate = () => {
-      console.log('Child has been created.............');
+    const openedEmail = ref();
+
+    // Sets open email
+    const openEmail = (email: Email) => {
+      openedEmail.value = email;
+
+      if (email) {
+        email.read = true;
+      }
+    };
+
+    const archiveEmail = (email: Email) => {
+      email.archived = true;
+
     }
-
-
-    return { handleCreate}
+    
+    return { openEmail, openedEmail, emailSelection: useEmailSelection(),  archiveEmail };
   },
-})
+});
+
 </script>
 
 <template>
   <table class="mail-table">
     <tbody>
-      <tr v-for="email in emails" :key="email.id">
-        
+      <tr v-for="email in emails" :key="email.id" @click="openEmail(email)">
         <td>
-          <input type="checkbox" />
+          <input type="checkbox"  :checked="emailSelection.emails.has(email)"
+                 @click="emailSelection.toggle(email)" />
         </td>
         <td>{{ email.from }}</td>
         <td>
@@ -38,13 +54,16 @@ export default defineComponent({
         </td>
         <td class="date">{{ new Date(email.sentAt) }}</td>
         <td>
-          <Button
-            @click="handleCreate"
-            content="Archive"
-            classes="bg-green-500"
-          ></Button>
+          <Button @click="archiveEmail(email)" content="Archive" classes="bg-green-500"></Button>
         </td>
       </tr>
     </tbody>
   </table>
+
+      <Modal v-if="openedEmail" :closeModal="() => { openedEmail = null;  }">
+
+
+        {{openedEmail}}
+
+      </Modal>
 </template>
