@@ -7,6 +7,9 @@ import MailView from "./MailView.vue";
 import { Email } from "../../types/email";
 import Button from "../atoms/Button.vue";
 
+
+ import { format } from 'date-fns';
+
 export default defineComponent({
   components: {
     Button,
@@ -59,13 +62,15 @@ export default defineComponent({
         openEmail(emails[index + indexChange]);
       }
     };
+ 
 
     return {
       openEmail,
       openedEmail,
       emailSelection: useEmailSelection(),
       archiveEmail,
-      changeEmail
+      changeEmail,
+     format 
     };
   },
 });
@@ -89,7 +94,7 @@ export default defineComponent({
             - {{ email.body }}
           </p>
         </td>
-        <td class="date">{{ new Date(email.sentAt) }}</td>
+        <td class="date">{{ format(new Date(email.sentAt), 'MMM do yyyy') }}</td>
         <td>
           <Button
             @click="archiveEmail(email)"
