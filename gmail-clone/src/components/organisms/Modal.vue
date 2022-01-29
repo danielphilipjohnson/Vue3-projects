@@ -12,7 +12,6 @@ export default defineComponent({
   <div class="modal">
     <div class="overlay" @click="closeModal"></div>
     <div class="modal-card">
-		test
       <slot />
     </div>
   </div>
