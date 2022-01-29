@@ -3,7 +3,7 @@ import { defineComponent, ref, computed } from "vue";
 import Button from "../components/atoms/Button.vue";
 import MailTable from "../components/organisms/MailTable.vue";
 import BulkActionBar from "../components/organisms/BulkActionBar.vue";
-import Modal from "../components/organisms/Modal.vue";;
+
 import { useEmailFiltering } from "../composables/useEmailFiltering";
 import { useEmailSelection } from "../composables/useEmailSelection";
 
@@ -12,7 +12,6 @@ export default defineComponent({
     BulkActionBar,
     Button,
     MailTable,
-    Modal
   },
 
   setup() {
@@ -68,13 +67,15 @@ export default defineComponent({
 
     const partialSelection = ref("partial-check");
 
+
+
     return {
 
       selectedScreen,
       selectScreen,
       partialSelection,
       filteredEmails,
-      emailSelection: useEmailSelection()
+      
     };
   },
 });
@@ -97,9 +98,9 @@ export default defineComponent({
     <h1>GMail clone: {{selectedScreen}}</h1>
 
     <BulkActionBar />
-    <!--<MailTable :emails="filteredEmails" />-->
+    <MailTable :emails="filteredEmails" />
 
-    <Modal :closeModal="() => { null; }" />
+
   </main>
 </template>
 
