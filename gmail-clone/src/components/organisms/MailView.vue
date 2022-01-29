@@ -42,16 +42,16 @@ export default defineComponent({
 
 <template>
   <div class="email-display">
-    <Button @click="alert()" classes="bg-red-500">{{
+    <Button @click="toggleArchive" classes="bg-red-500">{{
       email.archived ? "Move to Inbox (e)" : "Archive (e)"
     }}</Button>
 
-    <Button @click="alert()" classes="bg-red-500">{{
+    <Button @click="toggleRead" classes="bg-red-500">{{
       email.read ? "Mark Unread (r)" : "Mark Read (r)"
     }}</Button>
 
-    <Button @click="alert()" content="Newer (k)" classes="bg-red-500"></Button>
-    <Button @click="alert()" content="Older (j)" classes="bg-red-500"></Button>
+    <Button @click="goNewer" content="Newer (k)" classes="bg-red-500"></Button>
+    <Button @click="goOlder" content="Older (j)" classes="bg-red-500"></Button>
   </div>
 
   <h2 class="mb-0">
