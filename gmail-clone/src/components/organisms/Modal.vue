@@ -1,9 +1,8 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 export default defineComponent({
-  setup() {},
   props: {
-    closeModal: { type: Function as PropType<Function>, required: true},
+    closeModal: { type: Function as PropType<Function>, required: true },
   },
 });
 </script>

@@ -1,14 +1,13 @@
 <script lang="ts">
-import { defineComponent, ref, computed, PropType } from "vue";
-import { useEmailSelection } from "../../composables/useEmailSelection";
+import { defineComponent, ref, PropType } from "vue";
+import { format } from "date-fns";
+import Button from "../atoms/Button.vue";
 import Modal from "./Modal.vue";
 import MailView from "./MailView.vue";
 
+import { useEmailSelection } from "../../composables/useEmailSelection";
+
 import { Email } from "../../types/email";
-import Button from "../atoms/Button.vue";
-
-
- import { format } from 'date-fns';
 
 export default defineComponent({
   components: {
@@ -17,9 +16,9 @@ export default defineComponent({
     MailView,
   },
   props: {
-    emails: { type: Array as PropType<Array<Email>>, required: true},
+    emails: { type: Array as PropType<Array<Email>>, required: true },
   },
-  setup({emails}) {
+  setup({ emails }) {
     const openedEmail = ref();
 
     // Sets open email
@@ -43,7 +42,13 @@ export default defineComponent({
         toggleRead,
         save,
         closeModal,
-      }: { indexChange: number; toggleArchive: Boolean, toggleRead: Boolean, save: Boolean, closeModal: Boolean}
+      }: {
+        indexChange: number;
+        toggleArchive: boolean;
+        toggleRead: boolean;
+        save: boolean;
+        closeModal: boolean;
+      }
     ) => {
       if (toggleArchive) {
         email.archived = !email.archived;
@@ -51,7 +56,9 @@ export default defineComponent({
       if (toggleRead) {
         email.read = !email.read;
       }
-      if(save) { console.log("save later") }
+      if (save) {
+        console.log("save later");
+      }
       if (closeModal) {
         openedEmail.value = null;
         return null;
@@ -62,7 +69,6 @@ export default defineComponent({
         openEmail(emails[index + indexChange]);
       }
     };
- 
 
     return {
       openEmail,
@@ -70,7 +76,7 @@ export default defineComponent({
       emailSelection: useEmailSelection(),
       archiveEmail,
       changeEmail,
-     format 
+      format,
     };
   },
 });
@@ -79,7 +85,12 @@ export default defineComponent({
 <template>
   <table class="mail-table">
     <tbody>
-      <tr v-for="email in emails" :key="email.id" @click="openEmail(email)">
+      <tr
+        v-for="email in emails"
+        :key="email.id"
+        :class="[email.read ? 'read' : '', 'clickable']"
+        @click="openEmail(email)"
+      >
         <td>
           <input
             type="checkbox"
@@ -94,7 +105,9 @@ export default defineComponent({
             - {{ email.body }}
           </p>
         </td>
-        <td class="date">{{ format(new Date(email.sentAt), 'MMM do yyyy') }}</td>
+        <td class="date">
+          {{ format(new Date(email.sentAt), "MMM do yyyy") }}
+        </td>
         <td>
           <Button
             @click="archiveEmail(email)"
@@ -114,6 +127,9 @@ export default defineComponent({
       }
     "
   >
-    <MailView :email="openedEmail" :changeEmail="(args) => changeEmail(openedEmail, args)" />
+    <MailView
+      :email="openedEmail"
+      :changeEmail="(args) => changeEmail(openedEmail, args)"
+    />
   </Modal>
 </template>

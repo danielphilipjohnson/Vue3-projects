@@ -1,8 +1,7 @@
-import { emitWarning } from "process";
-import { reactive, ref, Ref, computed } from "vue";
+import { reactive} from "vue";
 import { Email } from "../types/email";
 
-let emailSet = new Set();
+const emailSet = new Set();
 
 export const useEmailSelection = () => {
   const emails = reactive(emailSet);

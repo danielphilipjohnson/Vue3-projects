@@ -1,8 +1,10 @@
 <script lang="ts">
-import { defineComponent, ref, computed } from "vue";
+import { defineComponent, ref } from "vue";
+
 import Button from "../components/atoms/Button.vue";
-import MailTable from "../components/organisms/MailTable.vue";
+
 import BulkActionBar from "../components/organisms/BulkActionBar.vue";
+import MailTable from "../components/organisms/MailTable.vue";
 
 import { useEmailFiltering } from "../composables/useEmailFiltering";
 import { useEmailSelection } from "../composables/useEmailSelection";
@@ -55,9 +57,9 @@ export default defineComponent({
         read: true,
       },
     ]);
-    
+
     const selectedScreen = ref("inbox");
-     const selectScreen = (newScreen) => {
+    const selectScreen = (newScreen: string) => {
       selectedScreen.value = newScreen;
       emailSelection.clear();
     };
@@ -65,17 +67,10 @@ export default defineComponent({
     const { filteredEmails } = useEmailFiltering(emails, selectedScreen);
     const emailSelection = useEmailSelection();
 
-    const partialSelection = ref("partial-check");
-
-
-
     return {
-
       selectedScreen,
       selectScreen,
-      partialSelection,
       filteredEmails,
-      
     };
   },
 });
@@ -95,13 +90,9 @@ export default defineComponent({
       :class="[selectedScreen == 'archive' ? 'selected' : '']"
       classes="bg-blue-500"
     ></Button>
-    <h1>GMail clone: {{selectedScreen}}</h1>
+    <h1>Gmail clone: {{ selectedScreen }}</h1>
 
-    <BulkActionBar />
+    <BulkActionBar :emails="filteredEmails" :selectedScreen="selectedScreen" />
     <MailTable :emails="filteredEmails" />
-
-
   </main>
 </template>
-
-

@@ -1,8 +1,12 @@
 <script lang="ts">
 import { defineComponent, computed, PropType } from "vue";
+
 import Button from "../atoms/Button.vue";
+
 import { useEmailSelection } from "../../composables/useEmailSelection";
+
 import { Email } from "../../types/email";
+
 export default defineComponent({
   components: {
     Button,
@@ -14,15 +18,18 @@ export default defineComponent({
     let numberSelected = computed(() => {
       return emailSelection.emails.size;
     });
+
     let allAreSelected = computed(() => {
       return (
         props.emails.length == numberSelected.value &&
         numberSelected.value !== 0
       );
     });
+
     let partialSelection = computed(() => {
       return numberSelected.value > 0 && !allAreSelected.value;
     });
+
     let bulkSelect = function () {
       if (allAreSelected.value) {
         emailSelection.clear();
@@ -31,12 +38,7 @@ export default defineComponent({
       }
     };
 
-    const handleCreate = () => {
-      console.log("Child has been created.............");
-    };
-
     return {
-      handleCreate,
       partialSelection,
       allAreSelected,
       bulkSelect,
@@ -47,11 +49,10 @@ export default defineComponent({
 
   props: {
     emails: { type: Array as PropType<Array<Email>>, required: true },
-    selectedScreen: { type: String as PropType<String>, required: true },
+    selectedScreen: { type: String as PropType<string>, required: true },
   },
 });
 </script>
-
 
 <template>
   <div class="bulk-action-bar">
@@ -68,12 +69,12 @@ export default defineComponent({
         @click="emailSelection.markRead()"
         content="Mark Read"
         classes="bg-blue-500"
-        :disabled="Array.from(emailSelection.emails).every(e => e.read)"
+        :disabled="Array.from(emailSelection.emails).every((e) => e.read)"
       ></Button>
 
       <Button
         @click="emailSelection.markUnread()"
-         :disabled="Array.from(emailSelection.emails).every(e => !e.read)"
+        :disabled="Array.from(emailSelection.emails).every((e) => !e.read)"
         content="Mark Unread"
         classes="bg-blue-500"
       ></Button>

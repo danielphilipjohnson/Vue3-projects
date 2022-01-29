@@ -3,20 +3,23 @@ import { computed, defineComponent, PropType } from "vue";
 import Button from "../atoms/Button.vue";
 import { Email } from "../../types/email";
 import { useKeydown } from "../../composables/useKeydown";
-import { format } from 'date-fns';
+import { format } from "date-fns";
 
 export default defineComponent({
   components: {
     Button,
   },
 
-  setup({email, changeEmail}) {
-    let toggleArchive = () => changeEmail({toggleArchive: true, save: true, closeModal: true})
-    let toggleRead = () => changeEmail({toggleRead: true, save: true})
-    let goNewer = () => changeEmail({indexChange: -1})
-    let goOlder = () => changeEmail({indexChange: 1})
-    let goNewerAndArchive = () => changeEmail({indexChange: -1, toggleArchive: true})
-    let goOlderAndArchive = () => changeEmail({indexChange: 1, toggleArchive: true})
+  setup({ email, changeEmail }) {
+    let toggleArchive = () =>
+      changeEmail({ toggleArchive: true, save: true, closeModal: true });
+    let toggleRead = () => changeEmail({ toggleRead: true, save: true });
+    let goNewer = () => changeEmail({ indexChange: -1 });
+    let goOlder = () => changeEmail({ indexChange: 1 });
+    let goNewerAndArchive = () =>
+      changeEmail({ indexChange: -1, toggleArchive: true });
+    let goOlderAndArchive = () =>
+      changeEmail({ indexChange: 1, toggleArchive: true });
 
     useKeydown([
       { key: "e", fn: toggleArchive },
@@ -28,16 +31,16 @@ export default defineComponent({
     ]);
 
     const formattedDate = computed(() => {
-        return format(new Date(email.sentAt), 'MMM do yyyy');
-    }) 
+      return format(new Date(email.sentAt), "MMM do yyyy");
+    });
 
-    return { 
-        goOlder,
-        goNewer,
-        toggleRead,
-        toggleArchive,
-        formattedDate
-    }
+    return {
+      goOlder,
+      goNewer,
+      toggleRead,
+      toggleArchive,
+      formattedDate,
+    };
   },
   props: {
     email: { type: Object as PropType<Email>, required: true },
@@ -69,4 +72,3 @@ export default defineComponent({
   </div>
   <p>{{ email.body }}</p>
 </template>
-

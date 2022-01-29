@@ -1,23 +1,23 @@
-import { onBeforeUnmount } from 'vue';
+import { onBeforeUnmount } from "vue";
 
 interface keycombo {
-  key: String,
-  fn: Function
+  key: string;
+  fn: Function;
 }
 
 export const useKeydown = function (keyCombos: Array<keycombo>) {
-  let onkey = function (event: KeyboardEvent) {
-    let kc = keyCombos.find(({ key, fn }) => key == event.key)
+  const onkey = function (event: KeyboardEvent) {
+    const kc = keyCombos.find(({ key, fn }) => key == event.key);
     if (kc) {
-      kc.fn()
+      kc.fn();
     }
-  }
+  };
 
-  window.addEventListener('keydown', onkey);
+  window.addEventListener("keydown", onkey);
 
   onBeforeUnmount(() => {
-    window.removeEventListener('keydown', onkey);
-  })
-}
+    window.removeEventListener("keydown", onkey);
+  });
+};
 
 export default useKeydown;
