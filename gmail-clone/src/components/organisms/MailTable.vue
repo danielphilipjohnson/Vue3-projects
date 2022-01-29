@@ -1,14 +1,17 @@
 <script lang="ts">
 import { defineComponent, ref, computed, PropType } from "vue";
 import { useEmailSelection } from "../../composables/useEmailSelection";
-import Modal from "./Modal.vue";;
+import Modal from "./Modal.vue";
+import MailView from "./MailView.vue";
 
 import { Email } from "../../types/email";
 import Button from "../atoms/Button.vue";
+
 export default defineComponent({
   components: {
     Button,
-    Modal
+    Modal,
+    MailView
   },
   props: {
     emails: { type: Array as PropType<Array<Email>> },
@@ -30,8 +33,8 @@ export default defineComponent({
       email.archived = true;
 
     }
-    
-    return { openEmail, openedEmail, emailSelection: useEmailSelection(),  archiveEmail };
+
+    return { openEmail, openedEmail, emailSelection: useEmailSelection(), archiveEmail };
   },
 });
 
@@ -42,8 +45,11 @@ export default defineComponent({
     <tbody>
       <tr v-for="email in emails" :key="email.id" @click="openEmail(email)">
         <td>
-          <input type="checkbox"  :checked="emailSelection.emails.has(email)"
-                 @click="emailSelection.toggle(email)" />
+          <input
+            type="checkbox"
+            :checked="emailSelection.emails.has(email)"
+            @click="emailSelection.toggle(email)"
+          />
         </td>
         <td>{{ email.from }}</td>
         <td>
@@ -60,10 +66,7 @@ export default defineComponent({
     </tbody>
   </table>
 
-      <Modal v-if="openedEmail" :closeModal="() => { openedEmail = null;  }">
-
-
-        {{openedEmail}}
-
-      </Modal>
+  <Modal v-if="openedEmail" :closeModal="() => { openedEmail = null; }">
+    <MailView :email="openedEmail" />
+  </Modal>
 </template>
