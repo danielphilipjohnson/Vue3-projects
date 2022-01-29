@@ -1,15 +1,16 @@
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
+import { computed, defineComponent, PropType } from "vue";
 import Button from "../atoms/Button.vue";
 import { Email } from "../../types/email";
 import { useKeydown } from "../../composables/useKeydown";
+import { format } from 'date-fns';
 
 export default defineComponent({
   components: {
     Button,
   },
 
-  setup({changeEmail}) {
+  setup({email, changeEmail}) {
     let toggleArchive = () => changeEmail({toggleArchive: true, save: true, closeModal: true})
     let toggleRead = () => changeEmail({toggleRead: true, save: true})
     let goNewer = () => changeEmail({indexChange: -1})
@@ -26,11 +27,16 @@ export default defineComponent({
       { key: "]", fn: goOlderAndArchive },
     ]);
 
+    const formattedDate = computed(() => {
+        return format(new Date(email.sentAt), 'MMM do yyyy');
+    }) 
+
     return { 
         goOlder,
         goNewer,
         toggleRead,
-        toggleArchive
+        toggleArchive,
+        formattedDate
     }
   },
   props: {
@@ -59,7 +65,7 @@ export default defineComponent({
     <strong>{{ email.subject }}</strong>
   </h2>
   <div>
-    <em>From {{ email.from }} on {{ new Date(email.sentAt) }}</em>
+    <em>From {{ email.from }} on {{ formattedDate }}</em>
   </div>
   <p>{{ email.body }}</p>
 </template>
