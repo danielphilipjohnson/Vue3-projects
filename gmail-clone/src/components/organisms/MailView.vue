@@ -1,14 +1,18 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import Button from "../atoms/Button.vue";
 import { Email } from "../../types/email";
 
 export default defineComponent({
+  components: {
+    Button
+  },
 
   setup() {
 
   },
   props: {
-    email: { type: Object as PropType<Email>, required: true},
+    email: { type: Object as PropType<Email>, required: true },
 
   }
 })
@@ -16,10 +20,18 @@ export default defineComponent({
 
 <template>
   <div class="email-display">
-    <button @click="alert()">{{ email.archived ? 'Move to Inbox (e)' : 'Archive (e)' }}</button>
-    <button @click="alert()">{{ email.read ? 'Mark Unread (r)' : 'Mark Read (r)' }}</button>
-    <button @click="alert()">Newer (k)</button>
-    <button @click="alert()">Older (j)</button>
+    <Button
+      @click="alert()"
+      classes="bg-red-500"
+    >{{ email.archived ? 'Move to Inbox (e)' : 'Archive (e)' }}</Button>
+
+    <Button
+      @click="alert()"
+      classes="bg-red-500"
+    >{{ email.read ? 'Mark Unread (r)' : 'Mark Read (r)' }}</Button>
+
+    <Button @click="alert()" content="Newer (k)" classes="bg-red-500"></Button>
+    <Button @click="alert()" content="Older (j)" classes="bg-red-500"></Button>
   </div>
 
   <h2 class="mb-0">
@@ -32,7 +44,3 @@ export default defineComponent({
   <p>{{ email.body }}</p>
 </template>
 
-
-
-<style scoped>
-</style>
