@@ -8,11 +8,9 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import ItemList from "@/components/items/ItemList.vue"; // @ is an alias to /src
-interface Item {
-  id: number
-  name: string
-}
+import ItemList from "@/components/items/ItemList.vue";
+import  {Item}  from "@/models/items/item.interface";
+
 
 export default defineComponent({
   name: "Home",
@@ -21,9 +19,9 @@ export default defineComponent({
   },
   setup() {
     const items: Item[] = [
-      { id: 1, name: "Item 1" },
-      { id: 2, name: "Item 2" },
-      { id: 3, name: "Item 3" },
+      { id: 1, name: "Item 1", selected: true },
+      { id: 2, name: "Item 2", selected: false },
+      { id: 3, name: "Item 3", selected: false },
     ];
     return {
       items
