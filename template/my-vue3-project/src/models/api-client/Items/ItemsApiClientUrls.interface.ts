@@ -1,3 +1,4 @@
+
 /**
  * @Name ItemsApiClientUrlsInterface
  * @description
@@ -5,6 +6,5 @@
  * 
  * */
 export interface ItemsApiClientUrlsInterface {
-	fetchItems: string
+  fetchItems: string
 }
-
