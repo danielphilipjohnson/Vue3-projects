@@ -1,7 +1,8 @@
 <template>
   <div>
-    <h3>Items:</h3>
-    <ul>
+    <h3>My Items - loading: {{ loading }}:</h3>
+    <Loader v-show="loading" />
+    <ul v-show="!loading">
       <ItemComponent
         v-for="item in items"
         :key="item.id"
@@ -15,22 +16,30 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 
-import Item  from "../../models/items/item.interface";
+import Item from "../../models/items/item.interface";
+import Loader from "../shared/Loader.vue";
+
 import ItemComponent from "./children/Item.vue";
 
 export default defineComponent({
   components: {
     ItemComponent,
+    Loader,
   },
   props: {
     items: {
       type: Array as PropType<Item[]>,
       required: true,
     },
+    loading: {
+      type: Boolean as PropType<boolean>,
+      required: true,
+    },
   },
-  setup() {
+  emits: ["selectItem"],
+  setup(props, { emit }) {
     const onItemSelected = (item: Item) => {
-      item.selected = !item.selected;
+      emit("selectItem", item);
     };
 
     return {
@@ -40,12 +49,12 @@ export default defineComponent({
 });
 </script>
 <style lang="scss">
-  ul {
-    list-style-type: none;
-    margin-block-start: 0;
-    margin-block-end: 0;
-    margin-inline-start: 0px;
-    margin-inline-end: 0px;
-    padding-inline-start: 0px;
-  }
+ul {
+  list-style-type: none;
+  margin-block-start: 0;
+  margin-block-end: 0;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  padding-inline-start: 0px;
+}
 </style>
