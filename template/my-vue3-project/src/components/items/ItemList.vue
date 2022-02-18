@@ -19,7 +19,7 @@ import { defineComponent, PropType } from "vue";
 import Item from "../../models/items/item.interface";
 import Loader from "../shared/Loader.vue";
 
-import ItemComponent from "./children/Item.vue";
+import ItemComponent from "./children/item.vue";
 
 export default defineComponent({
   components: {
