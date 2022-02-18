@@ -1,16 +1,16 @@
 <template>
   <div class="home">
     <img alt="Vue logo" src="../assets/logo.png" />
-    <item-list :items="items" />
-
+    {{loading}}
+    <item-list :items="items" :loading="loading" @selectItem="onSelectItem"/>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive } from "vue";
+import { computed, defineComponent, onMounted } from "vue";
 import ItemList from "@/components/items/ItemList.vue";
-import  Item  from "../models/items/item.interface";
-
+import Item from "@/models/items/item.interface";
+import store from "@/store";
 
 export default defineComponent({
   name: "Home",
@@ -18,23 +18,28 @@ export default defineComponent({
     ItemList,
   },
   setup() {
-   const items: Item[] = reactive([{
-        id: 1,
-        name: 'Item 1',
-        selected: true
-      }, {
-        id: 2,
-        name: 'Item 2',
-        selected: false
-      }, {
-        id: 3,
-        name: 'Item 3',
-        selected: false
-      }])
+    onMounted(() => {
+      store.dispatch("loadItems");
+    });
+    const items = computed(() => {
+      return store.state.items;
+    });
+    const loading = computed(() => {
+      return store.state.loading;
+    });
 
-      return {
-        items
+    const onSelectItem = (item: Item) => {
+        store.dispatch('selectItem', {
+          id: item.id,
+          selected: !item.selected
+        })
       }
+
+    return {
+      items,
+      loading,
+      onSelectItem
+    };
   },
 });
 </script>
