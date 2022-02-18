@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "serve": "cross-env VUE_APP_API_CLIENT=mock vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "build": "vue-cli-service VUE_APP_API_CLIENT=live build",
+    "build-staging": "vue-cli-service VUE_APP_API_CLIENT=mock build",
     "test:unit": "vue-cli-service test:unit",
     "test:e2e": "vue-cli-service test:e2e",
     "lint": "vue-cli-service lint"
