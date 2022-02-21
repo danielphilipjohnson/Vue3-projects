@@ -1,0 +1,49 @@
+<template>
+  <div>
+    <h3>List Items</h3>
+    <Loader v-show="loading" />
+    <ul v-show="!loading">
+      <ItemComponent
+        v-for="(item, index) in items"
+        :key="item.id"
+        :isLast="index === items.length - 1"
+        :model="item"
+        @select="onItemSelect"
+      />
+    </ul>
+  </div>
+</template>
+
+<script lang="ts">
+import { defineComponent, PropType } from "vue";
+import { ItemInterface } from "@/models/items/Item.interface";
+import ItemComponent from "./children/Item.component.vue";
+import Loader from "@/components/shared/Loader.component.vue";
+
+export default defineComponent({
+  name: "ItemsListComponent",
+  components: {
+    ItemComponent,
+    Loader,
+  },
+  props: {
+    items: {
+      type: Array as PropType<ItemInterface[]>,
+      default: () => [],
+    },
+    loading: {
+      type: Boolean,
+    },
+  },
+  emits: ["selectItem"],
+  setup(props, { emit }) {
+    const onItemSelect = (item: ItemInterface) => {
+      emit("selectItem", item);
+    };
+
+    return {
+      onItemSelect,
+    };
+  },
+});
+</script>
