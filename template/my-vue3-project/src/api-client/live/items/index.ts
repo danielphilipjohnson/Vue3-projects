@@ -1,14 +1,15 @@
 import {
-	ItemsApiClientUrlsInterface,
-	ItemsApiClientInterface,
-	ItemsApiClientModel
-} from '../../../models/api-client/Items'
+  ItemsApiClientUrlsInterface,
+  ItemsApiClientInterface,
+  ItemsApiClientModel,
+} from "@/models/api-client/items";
 
-const urls: ItemsApiClientUrlsInterface = {
-	fetchItems: '/static/data/items.json'
-}
+import { config } from "@/config";
 
-// instantiate the ItemsApiClient pointing at the url that returns static json mock \ data
-const itemsApiClient: ItemsApiClientInterface = new ItemsApiClientModel(urls)
+// urls for this API client
+const urls: ItemsApiClientUrlsInterface = config.items.apiUrls;
+
+// instantiate the ItemsApiClient pointing at the url that returns the live data from an API server
+const itemsApiClient: ItemsApiClientInterface = new ItemsApiClientModel(urls);
 // export our instance
-export default itemsApiClient
+export default itemsApiClient;
