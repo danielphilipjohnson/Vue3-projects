@@ -1,4 +1,4 @@
-import { HttpRequestParamsInterface } from './HttpRequestParams.interface'
+import { HttpRequestParamsInterface } from "./HttpRequestParams.interface";
 
 /**
  * @Name HttpClientInterface
@@ -6,6 +6,6 @@ import { HttpRequestParamsInterface } from './HttpRequestParams.interface'
  * Interface for our HttpClient wrapper
  */
 export interface HttpClientInterface {
-  get<T>(parameters: HttpRequestParamsInterface): Promise<T>
-  post<T>(parameters: HttpRequestParamsInterface): Promise<T>
+  get<T>(parameters: HttpRequestParamsInterface): Promise<T>;
+  post<T>(parameters: HttpRequestParamsInterface): Promise<T>;
 }

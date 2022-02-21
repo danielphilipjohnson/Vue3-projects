@@ -1,88 +1,74 @@
-import axios, {
-	AxiosRequestConfig,
-	AxiosResponse
-} from 'axios'
-
-import { HttpRequestParamsInterface } from './HttpRequestParams.interface'
-import { HttpClientInterface } from './HttpClient.interface'
+import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
+import { HttpRequestParamsInterface } from "./HttpRequestParams.interface";
+import { HttpClientInterface } from "./HttpClient.interface";
+import { config } from "@/config";
 
 /**
  * @name HttpClientModel
  * @description
- * Wraps http client functionality to avoid directly using a third party npm package\
- like axios
- * and simplify replacement in the future if such npm package would stop being devel\
-oped or other reasons
+ * Wraps http client functionality to avoid directly using a third party npm package like axios
+ * and simplify replacement in the future if such npm package would stop being developed or other reasons
  */
 export class HttpClientModel implements HttpClientInterface {
-	
-	//TODO Simple token for now later add an improvement to it
-	private getToken(): string {
-		const TOKEN_KEY =
-			process.env && process.env.VUE_APP_TOKEN_KEY
-				? process.env.VUE_APP_TOKEN_KEY
-				: 'myapp-token'
-		const token = localStorage.getItem(TOKEN_KEY) || ''
-		return token
-	}
+  private getToken(): string {
+    // get token key from App config
+    const TOKEN_KEY = config.httpClient.tokenKey || "myapp-token";
+    const token = localStorage.getItem(TOKEN_KEY) || "";
+    return token;
+  }
 
-	constructor() {
-		// OPTIONAL for now: Add request interceptor to handle errors or other things for each request in one place
-	}
+  constructor() {
+    // OPTIONAL for now: Add request interceptor to handle errors or other things for each request in one place
+  }
 
-	get<T>(parameters: HttpRequestParamsInterface): Promise<T> {
-		return new Promise<T>((resolve, reject) => {
-			const { url, requiresToken } = parameters
+  get<T>(parameters: HttpRequestParamsInterface): Promise<T> {
+    return new Promise<T>((resolve, reject) => {
+      const { url, requiresToken } = parameters;
 
-			// axios options
-			const options: AxiosRequestConfig = {
-				headers: {}
-			}
+      // axios options
+      const options: AxiosRequestConfig = {
+        headers: {},
+      };
 
-			if (requiresToken) {
-				const token = this.getToken()
-				
-				if(token && options.headers){
-					options.headers.RequestVerificationToken = token
-				}
-			}
+      if (requiresToken && options.headers) {
+        const token = this.getToken();
+        options.headers.RequestVerificationToken = token;
+      }
 
-			axios
-				.get(url, options)
-				.then((response: AxiosResponse) => {
-					resolve(response.data as T)
-				})
-				.catch((response: AxiosResponse) => {
-					console.info('------ rejecting ----')
-					reject(response)
-				})
-		})
-	}
-	
-	post<T>(parameters: HttpRequestParamsInterface): Promise<T> {
-		return new Promise<T>((resolve, reject) => {
-			const { url, requiresToken, payload } = parameters
+      axios
+        .get(url, options)
+        .then((response: AxiosResponse) => {
+          resolve(response.data as T);
+        })
+        .catch((error: AxiosResponse) => {
+          console.info("------ rejecting ----");
+          reject(error);
+        });
+    });
+  }
 
-			// axios options
-			const options: AxiosRequestConfig = {
-				headers: {}
-			}
+  post<T>(parameters: HttpRequestParamsInterface): Promise<T> {
+    return new Promise<T>((resolve, reject) => {
+      const { url, requiresToken, payload } = parameters;
 
-			if (requiresToken) {
-				const token = this.getToken()
-				if(token && options.headers){
-					options.headers.RequestVerificationToken = token
-				}
-			}
+      // axios options
+      const options: AxiosRequestConfig = {
+        headers: {},
+      };
 
-			axios
-				.post(url, payload, options)
-				.then((response: AxiosResponse) => {
-					resolve(response.data as T)
-				})
-				.catch((response: AxiosResponse) => {
-					reject(response)
-				})
-		})
-	}
+      if (requiresToken && options.headers) {
+        const token = this.getToken();
+        options.headers.RequestVerificationToken = token;
+      }
+
+      axios
+        .post(url, payload, options)
+        .then((response: AxiosResponse) => {
+          resolve(response.data as T);
+        })
+        .catch((error: AxiosResponse) => {
+          reject(error);
+        });
+    });
+  }
 }

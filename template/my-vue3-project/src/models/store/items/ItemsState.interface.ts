@@ -1,4 +1,4 @@
-import Item  from '@/models/items/item.interface'
+import { ItemInterface } from "@/models/items/Item.interface";
 
 /**
  * @name ItemsStateInterface
@@ -6,6 +6,6 @@ import Item  from '@/models/items/item.interface'
  * Interface for the Items state
  */
 export interface ItemsStateInterface {
-  loading: boolean
-  items: Item[]
+  loading: boolean;
+  items: ItemInterface[];
 }

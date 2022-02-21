@@ -1,4 +1,5 @@
-import { ItemsApiClientInterface } from './items'
+// GEN-IMPORTS
+import { ItemsApiClientInterface } from "./items";
 
 /**
  * @Name ApiClientInterface
@@ -6,6 +7,6 @@ import { ItemsApiClientInterface } from './items'
  * Interface wraps all api client modules into one places for keeping code organized.
  */
 export interface ApiClientInterface {
-  // Type of objects we are going to interact with via GET, POST, PATCH
-  items: ItemsApiClientInterface
+  // GEN-PROPERTIES
+  items: ItemsApiClientInterface;
 }
