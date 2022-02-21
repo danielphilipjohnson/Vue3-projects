@@ -1,44 +1,56 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png" />
-    {{loading}}
-    <item-list :items="items" :loading="loading" @selectItem="onSelectItem"/>
+    <ItemsListComponent
+      :items="items"
+      :loading="loading"
+      @selectItem="onSelectItem"
+    />
   </div>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted } from "vue";
-import ItemList from "@/components/items/ItemList.vue";
-import Item from "@/models/items/item.interface";
-import store from "@/store";
+import { defineComponent, computed, onMounted } from "vue";
+import { useItemsStore } from "@/store/items";
+import { MutationType } from "@/models/store";
+import ItemsListComponent from "@/components/items/ItemsList.component.vue";
+import { ItemInterface } from "@/models/items/Item.interface";
 
 export default defineComponent({
   name: "Home",
   components: {
-    ItemList,
+    ItemsListComponent,
   },
   setup() {
-    onMounted(() => {
-      store.dispatch("loadItems");
-    });
+    // private:
+    const itemsStore = useItemsStore();
+
+    // computed:
     const items = computed(() => {
-      return store.state.items;
+      return itemsStore.state.items;
     });
     const loading = computed(() => {
-      return store.state.loading;
+      return itemsStore.state.loading;
     });
 
-    const onSelectItem = (item: Item) => {
-        store.dispatch('selectItem', {
-          id: item.id,
-          selected: !item.selected
-        })
-      }
+    // methods:
+    const onSelectItem = (item: ItemInterface) => {
+      itemsStore.action(MutationType.items.selectItem, {
+        id: item.id,
+        selected: !item.selected,
+      });
+    };
+
+    // lifecycle event handlers:
+    onMounted(() => {
+      itemsStore.action(MutationType.items.loadItems);
+    });
 
     return {
+      // computed:
       items,
       loading,
-      onSelectItem
+      // methods:
+      onSelectItem,
     };
   },
 });
