@@ -27,34 +27,31 @@ describe("ItemList.vue", () => {
   });
 
   it("has expected css class when selected is false", () => {
-	const model: Item = {
-	  id: 2,
-	  name: "Unit test Item 2",
-	  selected: false,
-	}
+    const model: Item = {
+      id: 2,
+      name: "Unit test Item 2",
+      selected: false,
+    };
 
-	const wrapper = shallowMount(ItemList, {props:{model}});
+    const wrapper = shallowMount(ItemList, { props: { model } });
 
-	const classes = wrapper.classes();
-	expect(classes).to.be.an("array").that.includes("item");
-	expect(classes).to.be.an("array").that.does.not.includes("selected");
-
+    const classes = wrapper.classes();
+    expect(classes).to.be.an("array").that.includes("item");
+    expect(classes).to.be.an("array").that.does.not.includes("selected");
   });
-  it('has selected css class when selected istrue', () => {
+  it("has selected css class when selected istrue", () => {
+    // Selected manually for this test
+    const model: Item = {
+      id: 3,
+      name: "Unit test Item 3",
+      selected: true,
+    };
 
-	// Selected manually for this test
-	const model: Item = {
-	  id: 3,
-	  name: "Unit test Item 3",
-	  selected: true,
-	}
+    const wrapper = shallowMount(ItemList, { props: { model } });
+    const classes = wrapper.classes();
 
-	const wrapper = shallowMount(ItemList, {props:{model}});
-	const classes = wrapper.classes();
+    expect(classes).to.be.an("array").that.includes("item");
 
-	expect(classes).to.be.an("array").that.includes("item");
-	
-	expect(classes).to.be.an("array").that.includes("selected");
-
-  })
+    expect(classes).to.be.an("array").that.includes("selected");
+  });
 });

@@ -1,12 +1,12 @@
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
+import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 
 export interface MockedPromiseFactoryParamsInterface {
-  url: string
-  requestConfig: AxiosRequestConfig
-  statusCode: number
-  statusText: string
-  data: any
-  reject: boolean
+  url: string;
+  requestConfig: AxiosRequestConfig;
+  statusCode: number;
+  statusText: string;
+  data: any;
+  reject: boolean;
 }
 
 export const MockedPromiseFactory = (
@@ -16,17 +16,17 @@ export const MockedPromiseFactory = (
     setTimeout(() => {
       const response: AxiosResponse = {
         data: params.data,
-		status: params.statusCode,
+        status: params.statusCode,
         statusText: params.statusText,
         headers: [],
-        config: params.requestConfig
-      }
+        config: params.requestConfig,
+      };
 
       if (params.reject) {
-        reject(response)
+        reject(response);
       } else {
-        resolve(response)
+        resolve(response);
       }
-    }, 100)
-  })
-}
+    }, 100);
+  });
+};
