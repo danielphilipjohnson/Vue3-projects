@@ -1,24 +1,25 @@
 <template>
-  <form action=""></form>
-  <label for="email">Email</label>
-  <br />
-  <input v-model="email" placeholder="email" type="email" class="input" />
+  <form>
+    <label for="email">Email</label>
+    <br />
+    <input v-model="email" placeholder="email" type="email" class="input" />
 
-  <label for="password">Password</label>
-  <br />
-  <input v-model="password" type="password" class="input" />
+    <label for="password">Password</label>
+    <br />
+    <input v-model="password" type="password" class="input" />
 
-  <br />
+    <br />
 
-  <button
-    class="button is-info"
-    :class="{ 'is-loading': loading }"
-    @click.prevent="signInOrCreateUser()"
-  >
-    {{ isNewUser ? "Sign Up" : "Login" }}
-  </button>
+    <button
+      class="button is-info"
+      :class="{ 'is-loading': loading }"
+      @click.prevent="signInOrCreateUser()"
+    >
+      {{ isNewUser ? "Sign Up" : "Login" }}
+    </button>
 
-  <p class="has-text-danger" v-if="errorMessage">{{ errorMessage }}</p>
+    <p class="has-text-danger" v-if="errorMessage">{{ errorMessage }}</p>
+  </form>
 </template>
 
 <script lang="ts">
