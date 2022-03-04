@@ -2,19 +2,17 @@
   <div>
     Logged in as {{ user.uid }}
     <br />
-    <button @click="auth.signOut()" class="button">Sign Out</button>
+    <ButtonSignOut />
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "@vue/runtime-core";
-import { auth } from "../firebase";
+import ButtonSignOut from "./firebase/ButtonSignOut.vue";
 
 export default defineComponent({
-  setup() {
-    return {
-      auth,
-    };
+  components: {
+    ButtonSignOut,
   },
   props: {
     user: { type: Object as PropType<Record<string, unknown>>, required: true },
