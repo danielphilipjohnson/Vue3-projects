@@ -5,14 +5,13 @@
   </aside>
 </template>
 <script lang="ts">
+import { defineComponent } from "vue";
 import { auth } from "../firebase";
-
-export default {
-  name: "TheLogin",
+export default defineComponent({
   setup() {
     return {
       auth,
     };
   },
-};
+});
 </script>
