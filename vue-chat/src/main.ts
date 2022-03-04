@@ -1,4 +1,4 @@
-import { firestorePlugin } from 'vuefire';
+import { firestorePlugin } from "vuefire";
 
 import { createApp } from "vue";
 import App from "./App.vue";
