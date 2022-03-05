@@ -22,6 +22,20 @@
         >
           Send
         </button>
+
+        <h5>Record Audio</h5>
+
+        <button v-if="!recorder" @click="record()" class="button is-info">
+          Record Voice
+        </button>
+
+        <button v-else @click="stop()" class="button is-danger">Stop</button>
+
+        <br />
+
+        <audio v-if="newAudio" :src="newAudioURL" controls></audio>
+
+        <hr />
       </div>
 
       <TheLogin v-else />
@@ -64,6 +78,8 @@ export default defineComponent({
     const newMessageText = ref("");
     const loading = ref(false);
     const messages: Ref = ref([]);
+    const newAudio: Ref<Blob | MediaSource | null> = ref(null);
+    const recorder: Ref = ref(null);
 
     const chatQuery = query(
       collection(db, "chats", `${chatID.value}`, "messages"),
@@ -79,6 +95,7 @@ export default defineComponent({
       });
       messages.value = fireStoremessages;
     };
+
     setMessages();
 
     const addMessage = async (uid: string) => {
@@ -92,13 +109,51 @@ export default defineComponent({
       );
 
       // Add a new document with a generated id
-      const newCityRef = doc(collectionRef);
+      const newMessageRef = doc(collectionRef);
 
-      await setDoc(newCityRef, {
+      await setDoc(newMessageRef, {
         text: newMessageText.value,
         sender: uid,
         createdAt: Date.now(),
       });
+    };
+
+    const newAudioURL = computed(() => {
+      if (newAudio.value) {
+        return URL.createObjectURL(newAudio.value);
+      }
+      return "";
+    });
+
+    const record = async () => {
+      newAudio.value = null;
+
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: false,
+      });
+
+      const options = { mimeType: "audio/webm" };
+      const recordedChunks: any[] = [];
+      recorder.value = new MediaRecorder(stream, options);
+
+      recorder.value.addEventListener("dataavailable", (e) => {
+        if (e.data.size > 0) {
+          recordedChunks.push(e.data);
+        }
+      });
+
+      recorder.value.addEventListener("stop", () => {
+        newAudio.value = new Blob(recordedChunks);
+        console.log(newAudio);
+      });
+
+      recorder.value.start();
+    };
+
+    const stop = async () => {
+      recorder.value.stop();
+      recorder.value = null;
     };
 
     return {
@@ -107,6 +162,11 @@ export default defineComponent({
       addMessage,
       loading,
       messages,
+      newAudio,
+      recorder,
+      newAudioURL,
+      record,
+      stop,
     };
   },
 });
