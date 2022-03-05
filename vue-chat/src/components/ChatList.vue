@@ -29,7 +29,7 @@ export default defineComponent({
     let chats = ref();
 
     // TODO composable
-    const getDoc = async () => {
+    const setChats = async () => {
       const chatQuery = query(
         collection(db, "chats"),
         where("owner", "==", uid)
@@ -44,11 +44,10 @@ export default defineComponent({
           ...doc.data(),
         });
       });
-      chats.value = firestoreChats;
 
-      return querySnapshot;
+      chats.value = firestoreChats;
     };
-    getDoc();
+    setChats();
 
     const createChatRoom = async () => {
       const newChat = await db.collection("chats").add({
