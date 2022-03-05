@@ -5,14 +5,14 @@
 </template>
 
 <script lang="ts">
-import { auth } from "../firebase";
+import { getAuth } from "firebase/auth";
 
 import { defineComponent, ref, onUnmounted } from "vue";
 
 export default defineComponent({
   setup() {
     const user: any = ref(null);
-
+    const auth = getAuth();
     const unsubscribe: any | null = auth.onAuthStateChanged(
       (firebaseUser) => (user.value = firebaseUser)
     );

@@ -23,7 +23,12 @@
 </template>
 
 <script lang="ts">
-import { auth } from "../firebase";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+
 import { defineComponent } from "vue";
 import { ref, PropType } from "vue";
 
@@ -33,6 +38,8 @@ export default defineComponent({
   },
 
   setup(isNewUser) {
+    const auth = getAuth();
+
     let email = ref("");
     let password = ref("");
     let errorMessage = ref("");
@@ -43,12 +50,13 @@ export default defineComponent({
       errorMessage.value = "";
       try {
         if (isNewUser.isNewUser) {
-          await auth.createUserWithEmailAndPassword(
+          await createUserWithEmailAndPassword(
+            auth,
             email.value,
             password.value
           );
         } else {
-          await auth.signInWithEmailAndPassword(email.value, password.value);
+          await signInWithEmailAndPassword(auth, email.value, password.value);
         }
       } catch (error: unknown) {
         if (error instanceof Error) {
