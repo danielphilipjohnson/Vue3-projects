@@ -6,7 +6,10 @@
       <div v-if="user">
         <ul>
           <li v-for="message of messages" :key="message.id">
-            {{ message.text }}
+            <ChatMessage
+              :message="message"
+              :owner="user.uid === message.sender"
+            />
           </li>
         </ul>
 
@@ -40,6 +43,7 @@ import {
 
 import UserBlock from "../components/UserBlock.vue";
 import TheLogin from "../components/TheLogin.vue";
+import ChatMessage from "../components/ChatMessage.vue";
 
 import { defineComponent } from "@vue/runtime-core";
 import { computed, Ref, ref } from "vue";
@@ -49,6 +53,7 @@ export default defineComponent({
   components: {
     UserBlock,
     TheLogin,
+    ChatMessage,
   },
   setup() {
     const route = useRoute();
