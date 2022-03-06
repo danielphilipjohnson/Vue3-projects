@@ -13,7 +13,7 @@
     <button
       class="button is-info"
       :class="{ 'is-loading': loading }"
-      @click.prevent="signInOrCreateUser()"
+      @click.prevent="signUp()"
     >
       {{ isNewUser ? "Sign Up" : "Login" }}
     </button>
@@ -23,14 +23,11 @@
 </template>
 
 <script lang="ts">
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
+import { signInOrCreateUser, AuthErrorHandle } from "../firestore-client/index";
 
-import { defineComponent } from "vue";
+import { defineComponent, Ref } from "vue";
 import { ref, PropType } from "vue";
+import { FirebaseError } from "@firebase/util";
 
 export default defineComponent({
   props: {
@@ -38,43 +35,33 @@ export default defineComponent({
   },
 
   setup(isNewUser) {
-    const auth = getAuth();
-
     let email = ref("");
     let password = ref("");
-    let errorMessage = ref("");
+    let errorMessage: Ref<string | null> = ref(null);
     let loading = ref(false);
 
-    const signInOrCreateUser = async () => {
+    const signUp = async () => {
       loading.value = true;
-      errorMessage.value = "";
-      try {
-        if (isNewUser.isNewUser) {
-          await createUserWithEmailAndPassword(
-            auth,
-            email.value,
-            password.value
-          );
-        } else {
-          await signInWithEmailAndPassword(auth, email.value, password.value);
-        }
-      } catch (error: unknown) {
-        if (error instanceof Error) {
-          //TODO handle error nicely when displaying feedback to user
-          errorMessage.value = error.message;
-        }
-      }
 
-      loading.value = false;
+      const error = await signInOrCreateUser(
+        isNewUser.isNewUser,
+        email,
+        password
+      );
+
+      if (error instanceof FirebaseError) {
+        errorMessage.value = AuthErrorHandle(error);
+        loading.value = false;
+      }
     };
 
     return {
-      auth,
       email,
       password,
       errorMessage,
       loading,
       signInOrCreateUser,
+      signUp,
     };
   },
 });
