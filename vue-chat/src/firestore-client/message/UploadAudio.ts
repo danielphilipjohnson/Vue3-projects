@@ -5,7 +5,7 @@ import { getDownloadURL, uploadBytesResumable } from "firebase/storage";
  * @description
  * Create a new message in firestore
  */
-export const createMessage = async (
+export const upLoadAudioClip = async (
   ext: any,
   newAudio: any,
   onSuccess: (downloadURL: string) => void
