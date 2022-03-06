@@ -13,6 +13,10 @@
         </ul>
 
         <input v-model="newMessageText" class="input" />
+        <div v-show="displayEmoji">
+          <VuemojiPicker @emojiClick="handleEmojiClick" />
+        </div>
+        <button @click="showEmoji()">:D</button>
 
         <button
           :disabled="(!newMessageText && !newAudio) || loading"
@@ -44,21 +48,23 @@
 <script lang="ts">
 import { db } from "../firebase";
 import { useGetLatestMessages } from "../composables/useGetLastestMessages";
-
 import { useRecordChat } from "../composables/useRecordChat";
-import { getStorage, ref as firestoreRef } from "firebase/storage";
 
+import { getStorage, ref as firestoreRef } from "firebase/storage";
 import { collection, doc } from "firebase/firestore";
 
 import UserBlock from "../components/UserBlock.vue";
 import TheLogin from "../components/TheLogin.vue";
 import ChatMessage from "../components/ChatMessage.vue";
+
 import { upLoadAudioClip } from "../firestore-client/message";
 import { defineComponent } from "@vue/runtime-core";
 import { computed, ref } from "vue";
 import { useRoute } from "vue-router";
 
 import { createMessage } from "../firestore-client/";
+
+import { VuemojiPicker, EmojiClickEventDetail } from "vuemoji-picker";
 
 export default defineComponent({
   components: {
@@ -75,6 +81,12 @@ export default defineComponent({
     const chatID = computed(() => {
       return route.params.id;
     });
+
+    const displayEmoji = ref(false);
+
+    const showEmoji = () => {
+      displayEmoji.value = !displayEmoji.value;
+    };
 
     const { messages } = useGetLatestMessages(chatID);
 
@@ -128,6 +140,10 @@ export default defineComponent({
       return "";
     });
 
+    const handleEmojiClick = (detail: EmojiClickEventDetail) => {
+      newMessageText.value += detail.unicode;
+    };
+
     return {
       newMessageText,
       chatID,
@@ -139,6 +155,9 @@ export default defineComponent({
       newAudioURL,
       record,
       stop,
+      handleEmojiClick,
+      showEmoji,
+      displayEmoji,
     };
   },
 });
