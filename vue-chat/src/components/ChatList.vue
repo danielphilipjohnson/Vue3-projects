@@ -7,7 +7,7 @@
         }}</router-link>
       </li>
     </ul>
-    <button @click="createChatRoom()" class="button">
+    <button @click="createChatRoom(uid)" class="button">
       Create New Chat Room
     </button>
   </div>
@@ -15,62 +15,17 @@
 
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
-import { PropType, ref } from "vue";
-import {
-  collection,
-  query,
-  where,
-  getDocs,
-  addDoc,
-  onSnapshot,
-} from "firebase/firestore";
-import { db } from "../firebase";
+import { PropType } from "vue";
+import { createChatRoom } from "../firestore-client/index";
+import { useGetChatRooms } from "../composables/useGetChatRooms";
 
 export default defineComponent({
   name: "ChatList",
   props: {
     uid: { type: String as PropType<string>, required: true },
   },
-  setup(uid) {
-    const chats: any = ref([]);
-
-    // TODO composable
-    const setChats = async () => {
-      const chatQuery = query(
-        collection(db, "chats"),
-        where("owner", "==", uid)
-      );
-
-      const querySnapshot = await getDocs(chatQuery);
-      const firestoreChats: Array<Record<string, any>> = [];
-
-      querySnapshot.forEach((doc) => {
-        firestoreChats.push({
-          id: doc.id,
-          ...doc.data(),
-        });
-      });
-    };
-
-    setChats();
-
-    const createChatRoom = async () => {
-      // Add a new document with a generated id.
-      await addDoc(collection(db, "chats"), {
-        createdAt: Date.now(),
-        owner: uid,
-        members: [uid],
-      });
-    };
-
-    const q = query(collection(db, "chats"));
-
-    onSnapshot(q, (querySnapshot) => {
-      chats.value = [];
-      querySnapshot.forEach((doc) => {
-        chats.value.push({ id: doc.id, ...doc.data() });
-      });
-    });
+  setup() {
+    const { chats } = useGetChatRooms();
 
     return {
       createChatRoom,

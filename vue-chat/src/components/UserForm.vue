@@ -10,71 +10,55 @@
 
     <br />
 
-    <button
-      class="button is-info"
-      :class="{ 'is-loading': loading }"
-      @click.prevent="signInOrCreateUser()"
-    >
-      {{ isNewUser ? "Sign Up" : "Login" }}
-    </button>
+    <ButtonSignIn :loading="loading" :isNewUser="isNewUser" @click="signUp()" />
 
     <p class="has-text-danger" v-if="errorMessage">{{ errorMessage }}</p>
   </form>
 </template>
 
 <script lang="ts">
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
-
-import { defineComponent } from "vue";
+import { signInOrCreateUser, AuthErrorHandle } from "../firestore-client/index";
+import ButtonSignIn from "./firebase/ButtonSignIn.vue";
+import { defineComponent, Ref } from "vue";
 import { ref, PropType } from "vue";
+import { FirebaseError } from "@firebase/util";
 
 export default defineComponent({
+  components: {
+    ButtonSignIn,
+  },
   props: {
     isNewUser: { type: Boolean as PropType<boolean>, required: true },
   },
 
   setup(isNewUser) {
-    const auth = getAuth();
-
     let email = ref("");
     let password = ref("");
-    let errorMessage = ref("");
+    let errorMessage: Ref<string | null> = ref(null);
     let loading = ref(false);
 
-    const signInOrCreateUser = async () => {
+    const signUp = async () => {
       loading.value = true;
-      errorMessage.value = "";
-      try {
-        if (isNewUser.isNewUser) {
-          await createUserWithEmailAndPassword(
-            auth,
-            email.value,
-            password.value
-          );
-        } else {
-          await signInWithEmailAndPassword(auth, email.value, password.value);
-        }
-      } catch (error: unknown) {
-        if (error instanceof Error) {
-          //TODO handle error nicely when displaying feedback to user
-          errorMessage.value = error.message;
-        }
-      }
 
-      loading.value = false;
+      const error = await signInOrCreateUser(
+        isNewUser.isNewUser,
+        email,
+        password
+      );
+
+      if (error instanceof FirebaseError) {
+        errorMessage.value = AuthErrorHandle(error);
+        loading.value = false;
+      }
     };
 
     return {
-      auth,
       email,
       password,
       errorMessage,
       loading,
       signInOrCreateUser,
+      signUp,
     };
   },
 });
