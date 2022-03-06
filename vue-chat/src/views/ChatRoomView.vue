@@ -43,6 +43,8 @@
 </template>
 <script lang="ts">
 import { db } from "../firebase";
+import { VuemojiPicker, EmojiClickEventDetail } from "vuemoji-picker";
+
 import {
   getDownloadURL,
   getStorage,
@@ -73,6 +75,7 @@ export default defineComponent({
     UserBlock,
     TheLogin,
     ChatMessage,
+    VuemojiPicker,
   },
   setup() {
     const route = useRoute();
@@ -215,6 +218,10 @@ export default defineComponent({
     const stop = async () => {
       recorder.value.stop();
       recorder.value = null;
+    };
+
+    const handleEmojiClick = (detail: EmojiClickEventDetail) => {
+      console.log(detail);
     };
 
     return {
