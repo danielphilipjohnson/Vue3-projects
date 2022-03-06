@@ -2,7 +2,6 @@
   <div>
     <ul>
       <li v-for="chat of chats" :key="chat.id">
-        {{ chat.id }}
         <router-link :to="{ name: 'chat', params: { id: chat.id } }">{{
           chat.id
         }}</router-link>
@@ -17,7 +16,14 @@
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
 import { PropType, ref } from "vue";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  addDoc,
+  onSnapshot,
+} from "firebase/firestore";
 import { db } from "../firebase";
 
 export default defineComponent({
@@ -26,7 +32,7 @@ export default defineComponent({
     uid: { type: String as PropType<string>, required: true },
   },
   setup(uid) {
-    let chats = ref();
+    const chats: any = ref([]);
 
     // TODO composable
     const setChats = async () => {
@@ -44,20 +50,28 @@ export default defineComponent({
           ...doc.data(),
         });
       });
-
-      chats.value = firestoreChats;
     };
+
     setChats();
 
     const createChatRoom = async () => {
-      const newChat = await db.collection("chats").add({
+      // Add a new document with a generated id.
+      await addDoc(collection(db, "chats"), {
         createdAt: Date.now(),
         owner: uid,
         members: [uid],
       });
-
-      console.log(newChat);
     };
+
+    const q = query(collection(db, "chats"));
+
+    onSnapshot(q, (querySnapshot) => {
+      chats.value = [];
+      querySnapshot.forEach((doc) => {
+        chats.value.push({ id: doc.id, ...doc.data() });
+      });
+    });
+
     return {
       createChatRoom,
       chats,
