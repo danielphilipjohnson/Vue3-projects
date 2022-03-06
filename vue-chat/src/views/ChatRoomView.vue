@@ -1,6 +1,7 @@
 <template>
   <main class="section">
     <h3>Welcome to ChatRoom.vue {{ chatID }}</h3>
+
     <UserBlock v-slot="{ user }">
       <div v-if="user">
         <ul>
@@ -11,6 +12,10 @@
             />
           </li>
         </ul>
+        <div v-show="displayGiphy">
+          <GiphyContainer :dummyUser="user" :chatID="chatID" />
+        </div>
+        <button @click="showGiphy()">show gif</button>
 
         <input v-model="newMessageText" class="input" />
         <div v-show="displayEmoji">
@@ -65,6 +70,7 @@ import { useRoute } from "vue-router";
 import { createMessage } from "../firestore-client/";
 
 import { VuemojiPicker, EmojiClickEventDetail } from "vuemoji-picker";
+import GiphyContainer from "../components/GiphyContainer.vue";
 
 export default defineComponent({
   components: {
@@ -72,8 +78,9 @@ export default defineComponent({
     TheLogin,
     ChatMessage,
     VuemojiPicker,
+    GiphyContainer,
   },
-  setup() {
+  setup(user) {
     const newMessageText = ref("");
     const loading = ref(false);
 
@@ -83,9 +90,14 @@ export default defineComponent({
     });
 
     const displayEmoji = ref(false);
+    const displayGiphy = ref(false);
 
     const showEmoji = () => {
       displayEmoji.value = !displayEmoji.value;
+    };
+
+    const showGiphy = () => {
+      displayGiphy.value = !displayGiphy.value;
     };
 
     const { messages } = useGetLatestMessages(chatID);
@@ -158,6 +170,8 @@ export default defineComponent({
       handleEmojiClick,
       showEmoji,
       displayEmoji,
+      showGiphy,
+      displayGiphy,
     };
   },
 });
