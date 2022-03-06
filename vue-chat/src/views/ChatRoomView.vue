@@ -1,7 +1,6 @@
 <template>
   <main class="section">
     <h3>Welcome to ChatRoom.vue {{ chatID }}</h3>
-
     <UserBlock v-slot="{ user }">
       <div v-if="user">
         <ul>
@@ -43,12 +42,11 @@
   </main>
 </template>
 <script lang="ts">
-import { db, storage } from "../firebase";
+import { db } from "../firebase";
 import {
   getDownloadURL,
   getStorage,
   ref as firestoreRef,
-  uploadBytes,
   uploadBytesResumable,
 } from "firebase/storage";
 
@@ -59,8 +57,7 @@ import {
   orderBy,
   limitToLast,
   setDoc,
-  getDocs,
-  DocumentData,
+  onSnapshot,
 } from "firebase/firestore";
 
 import UserBlock from "../components/UserBlock.vue";
@@ -86,6 +83,7 @@ export default defineComponent({
     const newMessageText = ref("");
     const loading = ref(false);
     const messages: Ref = ref([]);
+
     const newAudio: Ref<Blob | null> = ref(null);
     const recorder: Ref = ref(null);
     const audioURL: Ref = ref(null);
@@ -96,16 +94,12 @@ export default defineComponent({
       limitToLast(10)
     );
 
-    const setMessages = async () => {
-      const querySnapshot = await getDocs(chatQuery);
-      const fireStoremessages: DocumentData[] = [];
+    onSnapshot(chatQuery, (querySnapshot) => {
+      messages.value = [];
       querySnapshot.forEach((doc) => {
-        fireStoremessages.push(doc.data());
+        messages.value.push({ id: doc.id, ...doc.data() });
       });
-      messages.value = fireStoremessages;
-    };
-
-    setMessages();
+    });
 
     const addMessage = async (uid: string) => {
       loading.value = true;
