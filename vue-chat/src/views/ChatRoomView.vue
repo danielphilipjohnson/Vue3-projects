@@ -46,29 +46,16 @@ import { db } from "../firebase";
 import { useGetLatestMessages } from "../composables/useGetLastestMessages";
 
 import { useRecordChat } from "../composables/useRecordChat";
-import {
-  getDownloadURL,
-  getStorage,
-  ref as firestoreRef,
-  uploadBytesResumable,
-} from "firebase/storage";
+import { getStorage, ref as firestoreRef } from "firebase/storage";
 
-import {
-  collection,
-  doc,
-  query,
-  orderBy,
-  limitToLast,
-  setDoc,
-  onSnapshot,
-} from "firebase/firestore";
+import { collection, doc } from "firebase/firestore";
 
 import UserBlock from "../components/UserBlock.vue";
 import TheLogin from "../components/TheLogin.vue";
 import ChatMessage from "../components/ChatMessage.vue";
 import { upLoadAudioClip } from "../firestore-client/message";
 import { defineComponent } from "@vue/runtime-core";
-import { computed, Ref, ref } from "vue";
+import { computed, ref } from "vue";
 import { useRoute } from "vue-router";
 
 import { createMessage } from "../firestore-client/";

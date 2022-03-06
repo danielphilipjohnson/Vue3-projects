@@ -1,5 +1,4 @@
-import { DocumentReference } from "@firebase/firestore-types";
-import { DocumentData, setDoc } from "firebase/firestore";
+import { setDoc } from "firebase/firestore";
 import { Ref } from "vue";
 
 /**
