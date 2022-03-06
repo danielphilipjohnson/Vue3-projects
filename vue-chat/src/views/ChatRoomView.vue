@@ -43,6 +43,7 @@
 </template>
 <script lang="ts">
 import { db } from "../firebase";
+import { useGetLatestMessages } from "../composables/useGetLastestMessages";
 
 import { useRecordChat } from "../composables/useRecordChat";
 import {
@@ -65,7 +66,7 @@ import {
 import UserBlock from "../components/UserBlock.vue";
 import TheLogin from "../components/TheLogin.vue";
 import ChatMessage from "../components/ChatMessage.vue";
-
+import { upLoadAudioClip } from "../firestore-client/message";
 import { defineComponent } from "@vue/runtime-core";
 import { computed, Ref, ref } from "vue";
 import { useRoute } from "vue-router";
@@ -79,27 +80,15 @@ export default defineComponent({
     ChatMessage,
   },
   setup() {
+    const newMessageText = ref("");
+    const loading = ref(false);
+
     const route = useRoute();
     const chatID = computed(() => {
       return route.params.id;
     });
 
-    const newMessageText = ref("");
-    const loading = ref(false);
-    const messages: Ref = ref([]);
-
-    const chatQuery = query(
-      collection(db, "chats", `${chatID.value}`, "messages"),
-      orderBy("createdAt"),
-      limitToLast(10)
-    );
-
-    onSnapshot(chatQuery, (querySnapshot) => {
-      messages.value = [];
-      querySnapshot.forEach((doc) => {
-        messages.value.push({ id: doc.id, ...doc.data() });
-      });
-    });
+    const { messages } = useGetLatestMessages(chatID);
 
     const { record, stop, recorder, newAudio } = useRecordChat();
 
@@ -114,9 +103,7 @@ export default defineComponent({
       );
       const storage = getStorage();
 
-      // TODO check value
       // Add a new document with a generated id
-
       const newMessageRef = doc(collectionRef);
       // If there is a audio recorded
       if (newAudio.value) {
@@ -126,56 +113,24 @@ export default defineComponent({
             "chats/" + chatID.value + "/" + newMessageRef.id + ".wav"
           );
 
-          const uploadTask = uploadBytesResumable(ext, newAudio.value);
+          upLoadAudioClip(ext, newAudio.value, async (downloadURL) => {
+            await createMessage(
+              newMessageRef,
+              newMessageText,
+              uid,
+              downloadURL
+            );
 
-          // Register three observers:
-          // 1. 'state_changed' observer, called any time the state changes
-          // 2. Error observer, called on failure
-          // 3. Completion observer, called on successful completion
-          uploadTask.on(
-            "state_changed",
-            (snapshot: any) => {
-              // Observe state change events such as progress, pause, and resume
-              // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-              const progress =
-                (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-              console.log("Upload is " + progress + "% done");
-              switch (snapshot.state) {
-                case "paused":
-                  console.log("Upload is paused");
-                  break;
-                case "running":
-                  console.log("Upload is running");
-                  break;
-              }
-            },
-            (error: any) => {
-              console.log(error);
-              // Handle unsuccessful uploads
-            },
-            () => {
-              // Handle successful uploads on complete
-              // For instance, get the download URL: https://firebasestorage.googleapis.com/...
-              getDownloadURL(uploadTask.snapshot.ref).then(
-                async (downloadURL) => {
-                  console.log("File available at", downloadURL);
-                  createMessage(
-                    newMessageRef,
-                    newMessageText,
-                    uid,
-                    downloadURL
-                  );
-                }
-              );
-            }
-          );
+            newMessageText.value = "";
+          });
         }
       } else {
         createMessage(newMessageRef, newMessageText, uid);
+        newMessageText.value = "";
       }
 
-      newMessageText.value = "";
       loading.value = false;
+      newAudio.value = null;
     };
 
     const newAudioURL = computed(() => {
