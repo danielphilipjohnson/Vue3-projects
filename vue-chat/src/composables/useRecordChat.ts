@@ -3,11 +3,12 @@ import { Ref, ref } from "vue";
 /**
  * Reactive `Chat audio`
  */
-export function useGetChatRooms() {
+export function useRecordChat() {
   const newAudio: Ref<Blob | null> = ref(null);
   const recorder: Ref = ref(null);
 
   const record = async () => {
+    // reset the audio
     newAudio.value = null;
 
     const stream = await navigator.mediaDevices.getUserMedia({
@@ -30,10 +31,14 @@ export function useGetChatRooms() {
 
     recorder.value.addEventListener("stop", () => {
       newAudio.value = new Blob(recordedChunks);
-      console.log(newAudio);
     });
 
     recorder.value.start();
   };
-  return { record };
+
+  const stop = async () => {
+    recorder.value.stop();
+    recorder.value = null;
+  };
+  return { record, stop, recorder, newAudio };
 }
