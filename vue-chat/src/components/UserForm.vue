@@ -10,13 +10,7 @@
 
     <br />
 
-    <button
-      class="button is-info"
-      :class="{ 'is-loading': loading }"
-      @click.prevent="signUp()"
-    >
-      {{ isNewUser ? "Sign Up" : "Login" }}
-    </button>
+    <ButtonSignIn :loading="loading" :isNewUser="isNewUser" @click="signUp()" />
 
     <p class="has-text-danger" v-if="errorMessage">{{ errorMessage }}</p>
   </form>
@@ -24,12 +18,15 @@
 
 <script lang="ts">
 import { signInOrCreateUser, AuthErrorHandle } from "../firestore-client/index";
-
+import ButtonSignIn from "./firebase/ButtonSignIn.vue";
 import { defineComponent, Ref } from "vue";
 import { ref, PropType } from "vue";
 import { FirebaseError } from "@firebase/util";
 
 export default defineComponent({
+  components: {
+    ButtonSignIn,
+  },
   props: {
     isNewUser: { type: Boolean as PropType<boolean>, required: true },
   },
