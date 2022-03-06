@@ -1,7 +1,6 @@
 <template>
   <main class="section">
     <h3>Welcome to ChatRoom.vue {{ chatID }}</h3>
-
     <UserBlock v-slot="{ user }">
       <div v-if="user">
         <ul>
@@ -43,7 +42,14 @@
   </main>
 </template>
 <script lang="ts">
-import { db, storage } from "../firebase";
+import { db } from "../firebase";
+import {
+  getDownloadURL,
+  getStorage,
+  ref as firestoreRef,
+  uploadBytesResumable,
+} from "firebase/storage";
+
 import {
   collection,
   doc,
@@ -51,8 +57,7 @@ import {
   orderBy,
   limitToLast,
   setDoc,
-  getDocs,
-  DocumentData,
+  onSnapshot,
 } from "firebase/firestore";
 
 import UserBlock from "../components/UserBlock.vue";
@@ -78,8 +83,10 @@ export default defineComponent({
     const newMessageText = ref("");
     const loading = ref(false);
     const messages: Ref = ref([]);
+
     const newAudio: Ref<Blob | null> = ref(null);
     const recorder: Ref = ref(null);
+    const audioURL: Ref = ref(null);
 
     const chatQuery = query(
       collection(db, "chats", `${chatID.value}`, "messages"),
@@ -87,20 +94,15 @@ export default defineComponent({
       limitToLast(10)
     );
 
-    const setMessages = async () => {
-      const querySnapshot = await getDocs(chatQuery);
-      const fireStoremessages: DocumentData[] = [];
+    onSnapshot(chatQuery, (querySnapshot) => {
+      messages.value = [];
       querySnapshot.forEach((doc) => {
-        fireStoremessages.push(doc.data());
+        messages.value.push({ id: doc.id, ...doc.data() });
       });
-      messages.value = fireStoremessages;
-    };
-
-    setMessages();
+    });
 
     const addMessage = async (uid: string) => {
       loading.value = true;
-      var audioURL;
 
       const collectionRef = collection(
         db,
@@ -108,27 +110,70 @@ export default defineComponent({
         `${chatID.value}`,
         "messages"
       );
-
+      const storage = getStorage();
       // Add a new document with a generated id
+
       const newMessageRef = doc(collectionRef);
       if (newAudio.value) {
         if (!Array.isArray(chatID.value)) {
-          const storageRef = storage
-            .ref("chats")
-            .child(chatID.value)
-            .child(`${newMessageRef.id}.wav`);
+          //const imagesRef = firestoreRef(storage, "chats/", "chatID.value" );
+          //const childImagesRef = firestoreRef(storage, "chats/" + chatID.value);
+          const ext = firestoreRef(
+            storage,
+            "chats/" + chatID.value + "/" + newMessageRef.id + ".wav"
+          );
 
-          await storageRef.put(newAudio.value);
-          audioURL = await storageRef.getDownloadURL();
+          const uploadTask = uploadBytesResumable(ext, newAudio.value);
+
+          // Register three observers:
+          // 1. 'state_changed' observer, called any time the state changes
+          // 2. Error observer, called on failure
+          // 3. Completion observer, called on successful completion
+          uploadTask.on(
+            "state_changed",
+            (snapshot: any) => {
+              // Observe state change events such as progress, pause, and resume
+              // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+              const progress =
+                (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+              console.log("Upload is " + progress + "% done");
+              switch (snapshot.state) {
+                case "paused":
+                  console.log("Upload is paused");
+                  break;
+                case "running":
+                  console.log("Upload is running");
+                  break;
+              }
+            },
+            (error: any) => {
+              console.log(error);
+              // Handle unsuccessful uploads
+            },
+            () => {
+              // Handle successful uploads on complete
+              // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+              getDownloadURL(uploadTask.snapshot.ref).then(
+                async (downloadURL) => {
+                  console.log("File available at", downloadURL);
+                  // TODO set for audio then set without
+                  await setDoc(newMessageRef, {
+                    text: newMessageText.value,
+                    sender: uid,
+                    createdAt: Date.now(),
+                    audioURL: downloadURL,
+                  });
+                }
+              );
+            }
+          );
+
+          // TODO SET generic AUDIO
+          //const url = await getDownloadURL(ext);
         }
       }
 
-      await setDoc(newMessageRef, {
-        text: newMessageText.value,
-        sender: uid,
-        createdAt: Date.now(),
-        audioURL,
-      });
+      console.log(audioURL.value);
     };
 
     const newAudioURL = computed(() => {
