@@ -43,6 +43,8 @@
 </template>
 <script lang="ts">
 import { db } from "../firebase";
+
+import { useRecordChat } from "../composables/useRecordChat";
 import {
   getDownloadURL,
   getStorage,
@@ -68,6 +70,8 @@ import { defineComponent } from "@vue/runtime-core";
 import { computed, Ref, ref } from "vue";
 import { useRoute } from "vue-router";
 
+import { createMessage } from "../firestore-client/";
+
 export default defineComponent({
   components: {
     UserBlock,
@@ -84,10 +88,6 @@ export default defineComponent({
     const loading = ref(false);
     const messages: Ref = ref([]);
 
-    const newAudio: Ref<Blob | null> = ref(null);
-    const recorder: Ref = ref(null);
-    const audioURL: Ref = ref(null);
-
     const chatQuery = query(
       collection(db, "chats", `${chatID.value}`, "messages"),
       orderBy("createdAt"),
@@ -101,6 +101,8 @@ export default defineComponent({
       });
     });
 
+    const { record, stop, recorder, newAudio } = useRecordChat();
+
     const addMessage = async (uid: string) => {
       loading.value = true;
 
@@ -111,13 +113,14 @@ export default defineComponent({
         "messages"
       );
       const storage = getStorage();
+
+      // TODO check value
       // Add a new document with a generated id
 
       const newMessageRef = doc(collectionRef);
+      // If there is a audio recorded
       if (newAudio.value) {
         if (!Array.isArray(chatID.value)) {
-          //const imagesRef = firestoreRef(storage, "chats/", "chatID.value" );
-          //const childImagesRef = firestoreRef(storage, "chats/" + chatID.value);
           const ext = firestoreRef(
             storage,
             "chats/" + chatID.value + "/" + newMessageRef.id + ".wav"
@@ -156,24 +159,23 @@ export default defineComponent({
               getDownloadURL(uploadTask.snapshot.ref).then(
                 async (downloadURL) => {
                   console.log("File available at", downloadURL);
-                  // TODO set for audio then set without
-                  await setDoc(newMessageRef, {
-                    text: newMessageText.value,
-                    sender: uid,
-                    createdAt: Date.now(),
-                    audioURL: downloadURL,
-                  });
+                  createMessage(
+                    newMessageRef,
+                    newMessageText,
+                    uid,
+                    downloadURL
+                  );
                 }
               );
             }
           );
-
-          // TODO SET generic AUDIO
-          //const url = await getDownloadURL(ext);
         }
+      } else {
+        createMessage(newMessageRef, newMessageText, uid);
       }
 
-      console.log(audioURL.value);
+      newMessageText.value = "";
+      loading.value = false;
     };
 
     const newAudioURL = computed(() => {
@@ -182,40 +184,6 @@ export default defineComponent({
       }
       return "";
     });
-
-    const record = async () => {
-      newAudio.value = null;
-
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: false,
-      });
-
-      const options = { mimeType: "audio/webm" };
-      const recordedChunks: any[] = [];
-      recorder.value = new MediaRecorder(stream, options);
-
-      recorder.value.addEventListener(
-        "dataavailable",
-        (e: { data: { size: number } }) => {
-          if (e.data.size > 0) {
-            recordedChunks.push(e.data);
-          }
-        }
-      );
-
-      recorder.value.addEventListener("stop", () => {
-        newAudio.value = new Blob(recordedChunks);
-        console.log(newAudio);
-      });
-
-      recorder.value.start();
-    };
-
-    const stop = async () => {
-      recorder.value.stop();
-      recorder.value = null;
-    };
 
     return {
       newMessageText,
