@@ -9,9 +9,11 @@ import { Ref } from "vue";
 export const createMessage = async (
   newMessageRef: any,
   newMessageText: Ref,
-  uid: string,
-  downloadURL?: string | null
+  uid: any,
+  downloadURL?: string | null,
+  gifURL?: string | null
 ) => {
+ 
   // AudioURL is null if the user didn't record anything
   if (downloadURL) {
     await setDoc(newMessageRef, {
@@ -19,6 +21,14 @@ export const createMessage = async (
       sender: uid,
       createdAt: Date.now(),
       audioURL: downloadURL,
+    });
+  }
+  if (gifURL) {
+    await setDoc(newMessageRef, {
+      text: newMessageText.value,
+      sender: uid,
+      createdAt: Date.now(),
+      gifURL: gifURL,
     });
   } else {
     await setDoc(newMessageRef, {
