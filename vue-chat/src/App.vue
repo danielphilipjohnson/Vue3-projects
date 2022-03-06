@@ -5,5 +5,3 @@
   </nav>
   <router-view />
 </template>
-
-<style></style>

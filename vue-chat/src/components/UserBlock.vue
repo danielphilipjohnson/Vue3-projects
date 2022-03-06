@@ -1,23 +1,21 @@
 <template>
-  <div>
-    <slot :user="user"></slot>
-  </div>
+  <slot :user="user"></slot>
 </template>
 
 <script lang="ts">
 import { getAuth } from "firebase/auth";
 
-import { defineComponent, ref, onUnmounted } from "vue";
+import { defineComponent, ref, onUnmounted, Ref } from "vue";
 
 export default defineComponent({
   setup() {
-    const user: any = ref(null);
+    const user: Ref = ref(null);
     const auth = getAuth();
-    const unsubscribe: any | null = auth.onAuthStateChanged(
+    const unsubscribe = auth.onAuthStateChanged(
       (firebaseUser) => (user.value = firebaseUser)
     );
 
-    onUnmounted(() => clearInterval(unsubscribe()));
+    onUnmounted(() => unsubscribe());
 
     return {
       user,

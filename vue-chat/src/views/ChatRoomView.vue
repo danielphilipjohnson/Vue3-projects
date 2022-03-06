@@ -43,30 +43,22 @@
 </template>
 <script lang="ts">
 import { db } from "../firebase";
-import {
-  getDownloadURL,
-  getStorage,
-  ref as firestoreRef,
-  uploadBytesResumable,
-} from "firebase/storage";
+import { useGetLatestMessages } from "../composables/useGetLastestMessages";
 
-import {
-  collection,
-  doc,
-  query,
-  orderBy,
-  limitToLast,
-  setDoc,
-  onSnapshot,
-} from "firebase/firestore";
+import { useRecordChat } from "../composables/useRecordChat";
+import { getStorage, ref as firestoreRef } from "firebase/storage";
+
+import { collection, doc } from "firebase/firestore";
 
 import UserBlock from "../components/UserBlock.vue";
 import TheLogin from "../components/TheLogin.vue";
 import ChatMessage from "../components/ChatMessage.vue";
-
+import { upLoadAudioClip } from "../firestore-client/message";
 import { defineComponent } from "@vue/runtime-core";
-import { computed, Ref, ref } from "vue";
+import { computed, ref } from "vue";
 import { useRoute } from "vue-router";
+
+import { createMessage } from "../firestore-client/";
 
 export default defineComponent({
   components: {
@@ -75,31 +67,17 @@ export default defineComponent({
     ChatMessage,
   },
   setup() {
+    const newMessageText = ref("");
+    const loading = ref(false);
+
     const route = useRoute();
     const chatID = computed(() => {
       return route.params.id;
     });
 
-    const newMessageText = ref("");
-    const loading = ref(false);
-    const messages: Ref = ref([]);
+    const { messages } = useGetLatestMessages(chatID);
 
-    const newAudio: Ref<Blob | null> = ref(null);
-    const recorder: Ref = ref(null);
-    const audioURL: Ref = ref(null);
-
-    const chatQuery = query(
-      collection(db, "chats", `${chatID.value}`, "messages"),
-      orderBy("createdAt"),
-      limitToLast(10)
-    );
-
-    onSnapshot(chatQuery, (querySnapshot) => {
-      messages.value = [];
-      querySnapshot.forEach((doc) => {
-        messages.value.push({ id: doc.id, ...doc.data() });
-      });
-    });
+    const { record, stop, recorder, newAudio } = useRecordChat();
 
     const addMessage = async (uid: string) => {
       loading.value = true;
@@ -111,69 +89,35 @@ export default defineComponent({
         "messages"
       );
       const storage = getStorage();
-      // Add a new document with a generated id
 
+      // Add a new document with a generated id
       const newMessageRef = doc(collectionRef);
+      // If there is a audio recorded
       if (newAudio.value) {
         if (!Array.isArray(chatID.value)) {
-          //const imagesRef = firestoreRef(storage, "chats/", "chatID.value" );
-          //const childImagesRef = firestoreRef(storage, "chats/" + chatID.value);
           const ext = firestoreRef(
             storage,
             "chats/" + chatID.value + "/" + newMessageRef.id + ".wav"
           );
 
-          const uploadTask = uploadBytesResumable(ext, newAudio.value);
+          upLoadAudioClip(ext, newAudio.value, async (downloadURL) => {
+            await createMessage(
+              newMessageRef,
+              newMessageText,
+              uid,
+              downloadURL
+            );
 
-          // Register three observers:
-          // 1. 'state_changed' observer, called any time the state changes
-          // 2. Error observer, called on failure
-          // 3. Completion observer, called on successful completion
-          uploadTask.on(
-            "state_changed",
-            (snapshot: any) => {
-              // Observe state change events such as progress, pause, and resume
-              // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-              const progress =
-                (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-              console.log("Upload is " + progress + "% done");
-              switch (snapshot.state) {
-                case "paused":
-                  console.log("Upload is paused");
-                  break;
-                case "running":
-                  console.log("Upload is running");
-                  break;
-              }
-            },
-            (error: any) => {
-              console.log(error);
-              // Handle unsuccessful uploads
-            },
-            () => {
-              // Handle successful uploads on complete
-              // For instance, get the download URL: https://firebasestorage.googleapis.com/...
-              getDownloadURL(uploadTask.snapshot.ref).then(
-                async (downloadURL) => {
-                  console.log("File available at", downloadURL);
-                  // TODO set for audio then set without
-                  await setDoc(newMessageRef, {
-                    text: newMessageText.value,
-                    sender: uid,
-                    createdAt: Date.now(),
-                    audioURL: downloadURL,
-                  });
-                }
-              );
-            }
-          );
-
-          // TODO SET generic AUDIO
-          //const url = await getDownloadURL(ext);
+            newMessageText.value = "";
+          });
         }
+      } else {
+        createMessage(newMessageRef, newMessageText, uid);
+        newMessageText.value = "";
       }
 
-      console.log(audioURL.value);
+      loading.value = false;
+      newAudio.value = null;
     };
 
     const newAudioURL = computed(() => {
@@ -182,40 +126,6 @@ export default defineComponent({
       }
       return "";
     });
-
-    const record = async () => {
-      newAudio.value = null;
-
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: false,
-      });
-
-      const options = { mimeType: "audio/webm" };
-      const recordedChunks: any[] = [];
-      recorder.value = new MediaRecorder(stream, options);
-
-      recorder.value.addEventListener(
-        "dataavailable",
-        (e: { data: { size: number } }) => {
-          if (e.data.size > 0) {
-            recordedChunks.push(e.data);
-          }
-        }
-      );
-
-      recorder.value.addEventListener("stop", () => {
-        newAudio.value = new Blob(recordedChunks);
-        console.log(newAudio);
-      });
-
-      recorder.value.start();
-    };
-
-    const stop = async () => {
-      recorder.value.stop();
-      recorder.value = null;
-    };
 
     return {
       newMessageText,
