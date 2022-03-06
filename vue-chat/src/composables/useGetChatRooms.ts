@@ -1,12 +1,12 @@
 import { db } from "@/firebase";
 import { collection, onSnapshot, query } from "firebase/firestore";
-import { ref } from "vue";
+import { Ref, ref } from "vue";
 
 /**
  * Reactive `Chatrooms`
  */
 export function useGetChatRooms() {
-  const chats: any = ref([]);
+  const chats: Ref = ref([]);
 
   const q = query(collection(db, "chats"));
 
