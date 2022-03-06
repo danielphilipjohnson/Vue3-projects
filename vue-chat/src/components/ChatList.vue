@@ -14,11 +14,10 @@
 </template>
 
 <script lang="ts">
-import { createChatRoom } from "../firestore-client/index";
 import { defineComponent } from "@vue/runtime-core";
-import { PropType, ref } from "vue";
-import { collection, query, onSnapshot } from "firebase/firestore";
-import { db } from "../firebase";
+import { PropType } from "vue";
+import { createChatRoom } from "../firestore-client/index";
+import { useGetChatRooms } from "../composables/useGetChatRooms";
 
 export default defineComponent({
   name: "ChatList",
@@ -26,16 +25,7 @@ export default defineComponent({
     uid: { type: String as PropType<string>, required: true },
   },
   setup() {
-    const chats: any = ref([]);
-
-    const q = query(collection(db, "chats"));
-
-    onSnapshot(q, (querySnapshot) => {
-      chats.value = [];
-      querySnapshot.forEach((doc) => {
-        chats.value.push({ id: doc.id, ...doc.data() });
-      });
-    });
+    const { chats } = useGetChatRooms();
 
     return {
       createChatRoom,
