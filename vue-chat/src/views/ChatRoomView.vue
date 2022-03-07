@@ -126,18 +126,18 @@ export default defineComponent({
           );
 
           upLoadAudioClip(ext, newAudio.value, async (downloadURL) => {
-            await createMessage(
+            await createMessage({
               newMessageRef,
               newMessageText,
               uid,
-              downloadURL
-            );
+              downloadURL,
+            });
 
             newMessageText.value = "";
           });
         }
       } else {
-        createMessage(newMessageRef, newMessageText, uid);
+        createMessage({ newMessageRef, newMessageText, uid });
         newMessageText.value = "";
       }
 
