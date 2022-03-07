@@ -29,6 +29,7 @@ export const createMessage = async ({
       createdAt: Date.now(),
       audioURL: downloadURL,
     });
+    return;
   }
   if (gifURL) {
     await setDoc(newMessageRef, {
@@ -37,11 +38,13 @@ export const createMessage = async ({
       createdAt: Date.now(),
       gifURL: gifURL,
     });
+    return;
   } else {
     await setDoc(newMessageRef, {
       text: newMessageText.value,
       sender: uid,
       createdAt: Date.now(),
     });
+    return;
   }
 };
