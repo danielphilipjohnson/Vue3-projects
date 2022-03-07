@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@firebase/firestore-types": "^2.5.0",
+    "@giphy/js-fetch-api": "^4.1.2",
     "core-js": "^3.8.3",
     "firebase": "^9.6.8-20222320822",
     "register-service-worker": "^1.7.2",
