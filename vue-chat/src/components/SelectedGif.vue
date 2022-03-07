@@ -27,13 +27,12 @@ export default defineComponent({
 
     const sendGif = (selectedGif: string) => {
       if (auth.currentUser?.uid) {
-        createMessage(
+        createMessage({
           newMessageRef,
           newMessageText,
-          auth.currentUser?.uid,
-          null,
-          selectedGif
-        );
+          uid: auth.currentUser?.uid,
+          gifURL: selectedGif,
+        });
       } else {
         throw new Error("Couldnt send your message. Please try again.");
       }
