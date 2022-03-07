@@ -1,4 +1,9 @@
-import { getDownloadURL, uploadBytesResumable } from "firebase/storage";
+import {
+  getDownloadURL,
+  StorageReference,
+  uploadBytesResumable,
+  UploadTaskSnapshot,
+} from "firebase/storage";
 
 /**
  * @Name createMessage
@@ -6,11 +11,11 @@ import { getDownloadURL, uploadBytesResumable } from "firebase/storage";
  * Create a new message in firestore
  */
 export const upLoadAudioClip = async (
-  ext: any,
-  newAudio: any,
+  storageReference: StorageReference,
+  newAudio: Blob,
   onSuccess: (downloadURL: string) => void
 ) => {
-  const uploadTask = uploadBytesResumable(ext, newAudio);
+  const uploadTask = uploadBytesResumable(storageReference, newAudio);
 
   // Register three observers:
   // 1. 'state_changed' observer, called any time the state changes
@@ -18,11 +23,11 @@ export const upLoadAudioClip = async (
   // 3. Completion observer, called on successful completion
   uploadTask.on(
     "state_changed",
-    (snapshot: any) => {
+    (snapshot: UploadTaskSnapshot) => {
       // Observe state change events such as progress, pause, and resume
       // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
       const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-      console.log("Upload is " + progress + "% done");
+      console.log(progress);
       switch (snapshot.state) {
         case "paused":
           console.log("Upload is paused");
@@ -32,13 +37,12 @@ export const upLoadAudioClip = async (
           break;
       }
     },
-    (error: any) => {
+    (error: Error) => {
       console.log(error);
       // Handle unsuccessful uploads
     },
     () => {
       // Handle successful uploads on complete
-      // For instance, get the download URL: https://firebasestorage.googleapis.com/...
       getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
         if (onSuccess) {
           onSuccess(downloadURL);

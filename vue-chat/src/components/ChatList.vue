@@ -16,6 +16,7 @@
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
 import { PropType } from "vue";
+
 import { createChatRoom } from "../firestore-client/index";
 import { useGetChatRooms } from "../composables/useGetChatRooms";
 
