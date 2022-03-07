@@ -6,13 +6,21 @@ import { Ref } from "vue";
  * @description
  * Create a new message in firestore
  */
-export const createMessage = async (
-  newMessageRef: any,
-  newMessageText: Ref,
-  uid: any,
-  downloadURL?: string | null,
-  gifURL?: string | null
-) => {
+
+interface createMessage {
+  newMessageRef: any;
+  newMessageText: Ref;
+  uid: any;
+  downloadURL?: string | null;
+  gifURL?: string | null;
+}
+export const createMessage = async ({
+  newMessageRef,
+  newMessageText,
+  uid,
+  downloadURL,
+  gifURL,
+}: createMessage) => {
   // AudioURL is null if the user didn't record anything
   if (downloadURL) {
     await setDoc(newMessageRef, {
