@@ -7,9 +7,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, ref } from "vue";
+import { defineComponent, PropType, Ref, ref } from "vue";
 import { getAuth } from "firebase/auth";
 import { createMessage, getMessageCollection } from "../firestore-client/";
+import { DocumentData } from "@firebase/firestore-types";
 
 export default defineComponent({
   props: {
@@ -17,13 +18,17 @@ export default defineComponent({
       type: String as PropType<string>,
       required: true,
     },
-    chatID: { type: String as PropType<string>, required: true },
+    chatID: { type: String as PropType<string | string[]>, required: true },
   },
   setup(chatID) {
     const auth = getAuth();
     const newMessageText = ref("");
 
-    const newMessageRef = getMessageCollection(chatID.chatID);
+    const parsedChatID = !Array.isArray(chatID.chatID) ? chatID.chatID : "";
+
+    const newMessageRef: Ref<DocumentData> = ref(
+      getMessageCollection(parsedChatID)
+    );
 
     const sendGif = (selectedGif: string) => {
       if (auth.currentUser?.uid) {
@@ -37,6 +42,7 @@ export default defineComponent({
         throw new Error("Couldnt send your message. Please try again.");
       }
     };
+
     return {
       sendGif,
       newMessageText,
