@@ -1,46 +1,36 @@
 <template>
   <div>
-    <div>
-      <img :src="selectedGif" alt="placeholder" />
-      <input v-model="newMessageText" class="input" type="text" />
-
-      <button @click="sendGif()">Submit</button>
-    </div>
+    <SelectedGif :selectedGif="selectedGif" :chatID="chatID" />
 
     <p>Select a gif {{ searchText }}</p>
     <input @change="search($event)" class="input" type="text" />
-    <div>
-      <!-- Populate single gif image -->
-      <template v-for="gif in gifs" :key="gif.id">
-        <img :src="gif" alt="" @click="selectGif($event)" />
-      </template>
-    </div>
+
+    <GiphyCards :gifs="gifs" @some-event="selectGif($event)" />
   </div>
 </template>
 
 <script lang="ts">
-// TODO on submit get the image url passed into submit button
-import { createMessage } from "../firestore-client/";
-import { getMessageCollection } from "../firestore-client/message";
+import { defineComponent, PropType, Ref, ref } from "vue";
 import { useGetSearchedGiphy } from "../composables/useGetSearchedGiphy";
 
-import { defineComponent, PropType, Ref, ref } from "vue";
-import { getAuth } from "firebase/auth";
+import GiphyCards from "./GiphyCards.vue";
+import SelectedGif from "./SelectedGif.vue";
 
 export default defineComponent({
+  components: {
+    GiphyCards,
+    SelectedGif,
+  },
   props: {
     chatID: { type: String as PropType<string>, required: true },
     dummyUser: { type: Object as PropType<object>, required: true },
   },
-  setup(chatID) {
-    const auth = getAuth();
-
+  setup() {
     const selectedGif = ref(
       "https://media.giphy.com/media/JRsQiAN79bPWUv43Ko/giphy.gif"
     );
 
     const gifs: Ref<any> = ref([]);
-    const newMessageText = ref("");
 
     const searchText = ref("");
 
@@ -57,35 +47,17 @@ export default defineComponent({
       }
     };
 
-    const newMessageRef = getMessageCollection(chatID.chatID);
-
     const selectGif = (event: Event) => {
       const target = event.target as HTMLImageElement;
       selectedGif.value = target.src;
     };
 
-    const sendGif = () => {
-      if (auth.currentUser?.uid) {
-        createMessage(
-          newMessageRef,
-          newMessageText,
-          auth.currentUser?.uid,
-          null,
-          selectedGif.value
-        );
-      } else {
-        throw new Error("Couldnt send your message. Please try again.");
-      }
-    };
-
     return {
       gifs,
-      newMessageText,
-      search,
       searchText,
-      sendGif,
-      selectGif,
       selectedGif,
+      search,
+      selectGif,
     };
   },
 });
