@@ -1,11 +1,14 @@
 <template>
   <div>
-    <SelectedGif :selectedGif="selectedGif" :chatID="chatID" />
+    <div v-show="displayGiphy">
+      <SelectedGif :selectedGif="selectedGif" :chatID="chatID" />
 
-    <p>Select a gif {{ searchText }}</p>
-    <input @change="search($event)" class="input" type="text" />
+      <p>Select a gif {{ searchText }}</p>
+      <input @change="search($event)" class="input" type="text" />
 
-    <GiphyCards :gifs="gifs" @some-event="selectGif($event)" />
+      <GiphyCards :gifs="gifs" @some-event="selectGif($event)" />
+    </div>
+    <button @click="showGiphy()">show gif</button>
   </div>
 </template>
 
@@ -22,7 +25,7 @@ export default defineComponent({
     SelectedGif,
   },
   props: {
-    chatID: { type: String as PropType<string>, required: true },
+    chatID: { type: String as PropType<string | string[]>, required: true },
     dummyUser: { type: Object as PropType<object>, required: true },
   },
   setup() {
@@ -31,7 +34,7 @@ export default defineComponent({
     );
 
     const gifs: Ref<any> = ref([]);
-
+    const displayGiphy = ref(false);
     const searchText = ref("");
 
     const search = async (event: Event) => {
@@ -52,12 +55,18 @@ export default defineComponent({
       selectedGif.value = target.src;
     };
 
+    const showGiphy = () => {
+      displayGiphy.value = !displayGiphy.value;
+    };
+
     return {
       gifs,
       searchText,
       selectedGif,
+      displayGiphy,
       search,
       selectGif,
+      showGiphy,
     };
   },
 });
