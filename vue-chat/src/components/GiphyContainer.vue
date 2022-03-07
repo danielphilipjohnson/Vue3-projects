@@ -1,21 +1,18 @@
 <template>
   <div>
     <div>
-      <img
-        src="https://media.giphy.com/media/JRsQiAN79bPWUv43Ko/giphy.gif"
-        alt="placeholder"
-      />
-      {{ dummyUser }}
+      <img :src="selectedGif" alt="placeholder" />
       <input v-model="newMessageText" class="input" type="text" />
 
-      <button>Submit</button>
+      <button @click="sendGif()">Submit</button>
     </div>
+
     <p>Select a gif {{ searchText }}</p>
     <input @change="search($event)" class="input" type="text" />
     <div>
       <!-- Populate single gif image -->
       <template v-for="gif in gifs" :key="gif.id">
-        <img :src="gif" alt="" />
+        <img :src="gif" alt="" @click="selectGif($event)" />
       </template>
     </div>
   </div>
@@ -23,73 +20,72 @@
 
 <script lang="ts">
 // TODO on submit get the image url passed into submit button
-import { GiphyFetch } from "@giphy/js-fetch-api";
 import { createMessage } from "../firestore-client/";
 import { getMessageCollection } from "../firestore-client/message";
+import { useGetSearchedGiphy } from "../composables/useGetSearchedGiphy";
 
 import { defineComponent, PropType, Ref, ref } from "vue";
-let API_KEY = process.env.VUE_APP_GIPHY_API_KEY;
+import { getAuth } from "firebase/auth";
 
 export default defineComponent({
   props: {
     chatID: { type: String as PropType<string>, required: true },
     dummyUser: { type: Object as PropType<object>, required: true },
   },
-  setup(chatID, dummyUser) {
-    const jsonData: Ref<any> = ref([]);
+  setup(chatID) {
+    const auth = getAuth();
+
+    const selectedGif = ref(
+      "https://media.giphy.com/media/JRsQiAN79bPWUv43Ko/giphy.gif"
+    );
+
     const gifs: Ref<any> = ref([]);
     const newMessageText = ref("");
 
     const searchText = ref("");
 
-    const getGiphyData = async (searchTerm: string) => {
-      if (API_KEY) {
-        const gf = new GiphyFetch(API_KEY);
-        const { data } = await gf.search(searchTerm, {
-          sort: "relevant",
-          limit: 10,
-          type: "stickers",
-        });
+    const search = async (event: Event) => {
+      const target = event.target as HTMLInputElement;
 
-        jsonData.value = data;
+      if (target.value) {
+        searchText.value = target.value;
 
-        const fetchedGifs = data
-          .map((gif) => gif.id)
-          .map((gifId) => {
-            return `https://media.giphy.com/media/${gifId}/giphy.gif`;
-          });
-
-        gifs.value = fetchedGifs;
-        console.log(gifs);
-      }
-    };
-
-    const search = (event: any) => {
-      if (event.target.value) {
-        searchText.value = event.target.value;
-
-        getGiphyData(event.target.value);
+        const { formattedGifs } = await useGetSearchedGiphy(target.value);
+        gifs.value = formattedGifs;
       } else {
-        console.log("empty");
+        throw new Error("Empty input: to be implemented");
       }
     };
 
     const newMessageRef = getMessageCollection(chatID.chatID);
-    newMessageText.value = "testing from giphy";
 
-    //createMessage(
-    //  newMessageRef,
-    //  newMessageText,
-    //  "8T3UEDOiltWTgggrL2Lxk2651tj1",
-    //  null,
-    //  "https://media.giphy.com/media/JRsQiAN79bPWUv43Ko/giphy.gif"
-    //);
+    const selectGif = (event: Event) => {
+      const target = event.target as HTMLImageElement;
+      selectedGif.value = target.src;
+    };
+
+    const sendGif = () => {
+      if (auth.currentUser?.uid) {
+        createMessage(
+          newMessageRef,
+          newMessageText,
+          auth.currentUser?.uid,
+          null,
+          selectedGif.value
+        );
+      } else {
+        throw new Error("Couldnt send your message. Please try again.");
+      }
+    };
 
     return {
       gifs,
       newMessageText,
       search,
       searchText,
+      sendGif,
+      selectGif,
+      selectedGif,
     };
   },
 });
