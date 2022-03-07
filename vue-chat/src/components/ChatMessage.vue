@@ -1,6 +1,7 @@
 <template>
   <div class="message" :class="{ 'from-user': owner }">
-    {{ message.text }}
+    <p>{{ message.text }}</p>
+
     <br />
 
     <img v-if="message.gifURL" :src="message.gifURL" alt="gif" />
