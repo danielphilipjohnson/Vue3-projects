@@ -1,5 +1,4 @@
 import { collection, doc } from "firebase/firestore";
-import { Ref } from "vue";
 import { db } from "../../firebase";
 /**
  * @Name getMessageCollection

@@ -17,17 +17,14 @@ export function useRecordChat() {
     });
 
     const options = { mimeType: "audio/webm" };
-    const recordedChunks: any[] = [];
+    const recordedChunks: Array<BlobPart> = [];
     recorder.value = new MediaRecorder(stream, options);
 
-    recorder.value.addEventListener(
-      "dataavailable",
-      (e: { data: { size: number } }) => {
-        if (e.data.size > 0) {
-          recordedChunks.push(e.data);
-        }
+    recorder.value.addEventListener("dataavailable", (e: BlobEvent) => {
+      if (e.data.size > 0) {
+        recordedChunks.push(e.data);
       }
-    );
+    });
 
     recorder.value.addEventListener("stop", () => {
       newAudio.value = new Blob(recordedChunks);

@@ -1,4 +1,4 @@
-import { setDoc } from "firebase/firestore";
+import { DocumentReference, setDoc } from "firebase/firestore";
 import { Ref } from "vue";
 
 /**
@@ -7,44 +7,41 @@ import { Ref } from "vue";
  * Create a new message in firestore
  */
 
-interface createMessage {
-  newMessageRef: any;
+interface refMessage {
+  newMessageRef: DocumentReference;
   newMessageText: Ref;
-  uid: any;
+  uid: string;
   downloadURL?: string | null;
   gifURL?: string | null;
 }
+interface message {
+  text: string;
+  sender: string;
+  createdAt: number;
+  downloadURL?: string | null;
+  gifURL?: string | null;
+}
+
 export const createMessage = async ({
   newMessageRef,
   newMessageText,
   uid,
   downloadURL,
   gifURL,
-}: createMessage) => {
-  // AudioURL is null if the user didn't record anything
+}: refMessage) => {
+  const baseOBJ: message = {
+    text: newMessageText.value,
+    sender: uid,
+    createdAt: Date.now(),
+  };
+
   if (downloadURL) {
-    await setDoc(newMessageRef, {
-      text: newMessageText.value,
-      sender: uid,
-      createdAt: Date.now(),
-      audioURL: downloadURL,
-    });
-    return;
+    baseOBJ.downloadURL = downloadURL;
   }
+
   if (gifURL) {
-    await setDoc(newMessageRef, {
-      text: newMessageText.value,
-      sender: uid,
-      createdAt: Date.now(),
-      gifURL: gifURL,
-    });
-    return;
-  } else {
-    await setDoc(newMessageRef, {
-      text: newMessageText.value,
-      sender: uid,
-      createdAt: Date.now(),
-    });
-    return;
+    baseOBJ.gifURL = gifURL;
   }
+
+  await setDoc(newMessageRef, baseOBJ);
 };
