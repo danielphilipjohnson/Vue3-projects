@@ -2,6 +2,7 @@ import { searchGiphy } from "../api-client/searchGiphy";
 
 /**
  * Reactive `Chatrooms`
+ * TODO convert to a firebase client function
  */
 export async function useGetSearchedGiphy(searchTerm: string) {
   const data = await searchGiphy(searchTerm);
