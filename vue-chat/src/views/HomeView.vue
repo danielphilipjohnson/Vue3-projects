@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <h1>Home</h1>
+    <h1 class="text-3xl font-bold underline">Home</h1>
     <UserBlock v-slot="{ user }">
       <div v-if="user">
         <UserProfile :user="user" />
