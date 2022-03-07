@@ -13,7 +13,6 @@ export const createMessage = async (
   downloadURL?: string | null,
   gifURL?: string | null
 ) => {
- 
   // AudioURL is null if the user didn't record anything
   if (downloadURL) {
     await setDoc(newMessageRef, {
