@@ -103,12 +103,12 @@ export default defineComponent({
       // If there is a audio recorded
       if (newAudio.value) {
         if (!Array.isArray(chatID.value)) {
-          const ext = firestoreRef(
+          const chatRef = firestoreRef(
             storage,
             "chats/" + chatID.value + "/" + newMessageRef.id + ".wav"
           );
 
-          upLoadAudioClip(ext, newAudio.value, async (downloadURL) => {
+          upLoadAudioClip(chatRef, newAudio.value, async (downloadURL) => {
             await createMessage({
               newMessageRef,
               newMessageText,
