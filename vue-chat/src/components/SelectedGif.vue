@@ -10,7 +10,6 @@
 import { defineComponent, PropType, Ref, ref } from "vue";
 import { getAuth } from "firebase/auth";
 import { createMessage, getMessageCollection } from "../firestore-client/";
-import { DocumentData } from "@firebase/firestore-types";
 
 export default defineComponent({
   props: {
@@ -26,14 +25,12 @@ export default defineComponent({
 
     const parsedChatID = !Array.isArray(chatID.chatID) ? chatID.chatID : "";
 
-    const newMessageRef: Ref<DocumentData> = ref(
-      getMessageCollection(parsedChatID)
-    );
+    const newMessageRef: Ref = ref(getMessageCollection(parsedChatID));
 
     const sendGif = (selectedGif: string) => {
       if (auth.currentUser?.uid) {
         createMessage({
-          newMessageRef,
+          newMessageRef: newMessageRef.value,
           newMessageText,
           uid: auth.currentUser?.uid,
           gifURL: selectedGif,

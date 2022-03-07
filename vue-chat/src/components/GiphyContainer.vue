@@ -33,7 +33,7 @@ export default defineComponent({
       "https://media.giphy.com/media/JRsQiAN79bPWUv43Ko/giphy.gif"
     );
 
-    const gifs: Ref<any> = ref([]);
+    const gifs: Ref<Array<string>> = ref([]);
     const displayGiphy = ref(false);
     const searchText = ref("");
 
