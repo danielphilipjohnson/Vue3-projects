@@ -12,16 +12,12 @@
             />
           </li>
         </ul>
-        <div v-show="displayGiphy">
-          <GiphyContainer :dummyUser="user" :chatID="chatID" />
-        </div>
-        <button @click="showGiphy()">show gif</button>
+
+        <GiphyContainer :dummyUser="user" :chatID="chatID" />
 
         <input v-model="newMessageText" class="input" />
-        <div v-show="displayEmoji">
-          <VuemojiPicker @emojiClick="handleEmojiClick" />
-        </div>
-        <button @click="showEmoji()">:D</button>
+
+        <EmojiContainer @handleEmojiClick="handleEmojiClick" />
 
         <button
           :disabled="(!newMessageText && !newAudio) || loading"
@@ -31,19 +27,13 @@
           Send
         </button>
 
-        <h5>Record Audio</h5>
-
-        <button v-if="!recorder" @click="record()" class="button is-info">
-          Record Voice
-        </button>
-
-        <button v-else @click="stop()" class="button is-danger">Stop</button>
-
-        <br />
-
-        <audio v-if="newAudio" :src="newAudioURL" controls></audio>
-
-        <hr />
+        <AudioPlayer
+          :recorder="recorder"
+          @audio-record="record()"
+          @audio-stop="stop()"
+          :newAudio="newAudio"
+          :newAudioURL="newAudioURL"
+        />
       </div>
 
       <TheLogin v-else />
@@ -61,6 +51,8 @@ import { collection, doc } from "firebase/firestore";
 import UserBlock from "../components/UserBlock.vue";
 import TheLogin from "../components/TheLogin.vue";
 import ChatMessage from "../components/ChatMessage.vue";
+import EmojiContainer from "../components/EmojiContainer.vue";
+import AudioPlayer from "@/components/AudioPlayer.vue";
 
 import { upLoadAudioClip } from "../firestore-client/message";
 import { defineComponent } from "@vue/runtime-core";
@@ -69,18 +61,19 @@ import { useRoute } from "vue-router";
 
 import { createMessage } from "../firestore-client/";
 
-import { VuemojiPicker, EmojiClickEventDetail } from "vuemoji-picker";
 import GiphyContainer from "../components/GiphyContainer.vue";
+import { EmojiClickEventDetail } from "vuemoji-picker";
 
 export default defineComponent({
   components: {
     UserBlock,
     TheLogin,
     ChatMessage,
-    VuemojiPicker,
     GiphyContainer,
+    EmojiContainer,
+    AudioPlayer,
   },
-  setup(user) {
+  setup() {
     const newMessageText = ref("");
     const loading = ref(false);
 
@@ -88,17 +81,6 @@ export default defineComponent({
     const chatID = computed(() => {
       return route.params.id;
     });
-
-    const displayEmoji = ref(false);
-    const displayGiphy = ref(false);
-
-    const showEmoji = () => {
-      displayEmoji.value = !displayEmoji.value;
-    };
-
-    const showGiphy = () => {
-      displayGiphy.value = !displayGiphy.value;
-    };
 
     const { messages } = useGetLatestMessages(chatID);
 
@@ -117,6 +99,7 @@ export default defineComponent({
 
       // Add a new document with a generated id
       const newMessageRef = doc(collectionRef);
+
       // If there is a audio recorded
       if (newAudio.value) {
         if (!Array.isArray(chatID.value)) {
@@ -132,7 +115,7 @@ export default defineComponent({
               uid,
               downloadURL,
             });
-
+            console.log("uploaded clip successfully");
             newMessageText.value = "";
           });
         }
@@ -159,7 +142,7 @@ export default defineComponent({
     return {
       newMessageText,
       chatID,
-      addMessage,
+
       loading,
       messages,
       newAudio,
@@ -167,11 +150,8 @@ export default defineComponent({
       newAudioURL,
       record,
       stop,
+      addMessage,
       handleEmojiClick,
-      showEmoji,
-      displayEmoji,
-      showGiphy,
-      displayGiphy,
     };
   },
 });
