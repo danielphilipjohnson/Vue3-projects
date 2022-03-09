@@ -1,6 +1,6 @@
 <template>
   <div
-    class="h-full max-w-sm max-h-screen min-h-screen col-span-1 p-6 overflow-y-scroll dark:bg-woodsmoke-400 dark:text-gray-100"
+    class="h-full max-h-screen min-h-screen col-span-1 p-6 overflow-y-scroll dark:bg-woodsmoke-400 dark:text-gray-100"
   >
     <SearchBar />
 
