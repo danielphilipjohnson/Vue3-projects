@@ -1,0 +1,23 @@
+<template>
+  <div class="flex py-2 pl-2 mb-4 bg-gray-500 rounded bg-woodsmoke-200">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="w-6 h-6"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      stroke-width="2"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+      />
+    </svg>
+    <input
+      class="w-full pl-4 bg-transparent"
+      type="text"
+      placeholder="Search Chat"
+    />
+  </div>
+</template>
