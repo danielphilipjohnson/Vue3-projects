@@ -1,13 +1,22 @@
 <template>
   <div
-    class="flex items-center justify-center w-full h-screen py-32 bg-indigo-100"
+    class="flex items-center justify-center w-full bg-indigo-100 lg:py-32 lg:h-screen"
   >
-    <div class="container flex mx-16 bg-white rounded-xl h-3/4">
-      <div class="flex flex-col justify-center w-1/2 p-32">
-        <h2 class="mb-4 text-4xl font-extrabold text-left text-black">
-          Log in.
-        </h2>
-        <p class="mb-8 text-black">How do to get started with the chat app?</p>
+    <div
+      class="container flex flex-col bg-white lg:flex-row lg:mx-16 lg:rounded-xl 2xl:h-3/4"
+    >
+      <div
+        class="flex flex-wrap h-screen px-8 py-16 lg:p-32 lg:w-1/2 lg:h-full"
+      >
+        <div>
+          <h2 class="mb-4 text-4xl font-extrabold text-left text-black">
+            Log in.
+          </h2>
+          <p class="text-black lg:mb-8">
+            How do to get started with the chat app?
+          </p>
+        </div>
+
         <form class="flex flex-col w-full max-w-lg">
           <div
             class="flex items-center mb-4 transition-all duration-500 border border-gray-300 rounded focus:border-indigo-500 focus:ring-1 hover:border-black"
@@ -70,9 +79,9 @@
         </form>
       </div>
 
-      <div class="relative w-1/2 overflow-hidden group">
+      <div class="relative overflow-hidden lg:w-1/2 group">
         <img
-          class="object-cover w-full h-full transition-transform transform group-hover:scale-110 group-hover:skew-y-1 rounded-br-xl rounded-tr-xl"
+          class="object-cover w-full h-full transition-transform transform group-hover:scale-110 group-hover:skew-y-1 lg:rounded-br-xl lg:rounded-tr-xl"
           src="../assets/login-bg.jpg"
           alt=""
         />
